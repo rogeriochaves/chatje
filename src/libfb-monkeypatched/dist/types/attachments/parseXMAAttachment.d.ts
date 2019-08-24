@@ -1,0 +1,2 @@
+import { AdvertXMA, EventReminderXMA, ExternalUrlXMA, GroupXMA, InstagramXMA, LeaderboardUpdateXMA, LightweightActionXMA, LiveLocationXMA, LocationXMA, MontageXMA, PageXMA, ProductXMA, StoryXMA, UnavailableXMA } from './XMAAttachment';
+export default function parseXMAAttachment(xma: any): UnavailableXMA | StoryXMA | ExternalUrlXMA | AdvertXMA | EventReminderXMA | LeaderboardUpdateXMA | LiveLocationXMA | LocationXMA | GroupXMA | LightweightActionXMA | PageXMA | ProductXMA | MontageXMA | InstagramXMA;

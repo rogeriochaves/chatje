@@ -1,0 +1,1 @@
+{"version":3,"file":"Ping.js","sourceRoot":"","sources":["../../../src/mqtt/messages/Ping.ts"],"names":[],"mappings":";;;AAAA,yEAAwC;AACxC,iDAA4C;AAC5C,4CAA8C;AAE9C;;GAEG;AACU,QAAA,UAAU,GAAG,GAAgB,EAAE;IAC1C,OAAO,IAAI,qBAAW,CAAC,0BAAW,CAAC,IAAI,CAAC;SACrC,QAAQ,CAAC,2BAAe,CAAC,IAAI,CAAC,CAAA;AACnC,CAAC,CAAA"}

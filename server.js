@@ -48,7 +48,7 @@ app.get("/api/user", (req, res) => {
 
 app.get("/api/threads", (req, res) => {
   facebook.client
-    .getThreadList()
+    .getThreadList(100)
     .then(x => {
       res.setHeader("Content-Type", "application/json");
       res.end(JSON.stringify(x));

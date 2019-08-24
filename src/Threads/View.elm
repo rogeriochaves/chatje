@@ -5,52 +5,57 @@ import Html.Attributes
 import RemoteData exposing (..)
 import Styles exposing (..)
 import Threads.Types exposing (..)
+import User.Types exposing (User)
 
 
-view : Model -> Element Msg
-view model =
+view : WebData User -> Model -> Element Msg
+view user model =
     column
         [ width (px 300)
         , clipY
         , scrollbarY
         , htmlAttribute (Html.Attributes.style "height" "100vh")
         ]
-        [ renderThreadList model ]
+        [ renderThreadList user model ]
 
 
-renderThreadList : Model -> Element Msg
-renderThreadList model =
+renderThreadList : WebData User -> Model -> Element Msg
+renderThreadList pendingUser model =
     el [ padding 10 ]
-        (case model.threads of
-            Loading ->
-                text "Loading..."
-
-            Success threads ->
+        (case ( model.threads, pendingUser ) of
+            ( Success threads, Success user ) ->
                 column
-                    [ spacing 5
+                    [ spacing 8
                     ]
-                    (List.map renderThread threads)
+                    (List.map (renderThread user) threads)
 
-            Failure _ ->
+            ( Failure _, _ ) ->
                 text "Error on loading threads"
 
-            NotAsked ->
-                Element.none
+            ( _, Failure _ ) ->
+                text "Error on loading user"
+
+            _ ->
+                text "Loading..."
         )
 
 
-renderThread : Thread -> Element Msg
-renderThread thread =
+renderThread : User -> Thread -> Element Msg
+renderThread user thread =
     case thread.name of
         Just name ->
-            text name
+            paragraph [ width (px 260) ] [ text name ]
 
         Nothing ->
-            text
-                (thread.participants
-                    |> List.map .name
-                    |> String.join ","
-                 -- |> List.head
-                 -- |> Maybe.map .name
-                 -- |> Maybe.withDefault "unamed"
-                )
+            let
+                threadName =
+                    thread.participants
+                        |> List.map .name
+                        |> List.filter (\name -> name /= user.name)
+                        |> String.join ", "
+            in
+            if threadName == "" then
+                Element.none
+
+            else
+                paragraph [ width (px 260) ] [ text threadName ]

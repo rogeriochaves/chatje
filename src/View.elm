@@ -25,7 +25,7 @@ renderRoute model =
         Home ->
             row [ width fill, height fill ]
                 [ el [ width fill, height fill ] (text "Messages will go here")
-                , Element.map MsgForThreads (Threads.View.view model.threads)
+                , Element.map MsgForThreads (Threads.View.view model.user.user model.threads)
                 ]
 
         NotFound ->

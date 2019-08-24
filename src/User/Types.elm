@@ -4,7 +4,7 @@ import RemoteData exposing (..)
 
 
 type alias Model =
-    { user : User
+    { user : WebData User
     }
 
 

@@ -1,11 +1,17 @@
-module User.Types exposing (Model, Msg(..), User)
+module User.Types exposing (Model, Msg(..), User, Users)
 
+import Dict
 import RemoteData exposing (..)
 
 
 type alias Model =
-    { user : WebData User
+    { currentUser : WebData User
+    , users : Users
     }
+
+
+type alias Users =
+    Dict.Dict String User
 
 
 type alias User =

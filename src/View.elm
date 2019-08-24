@@ -25,8 +25,8 @@ renderRoute model =
     let
         mainView mainScreen =
             row [ width fill, height fill ]
-                [ el [ padding 8, width fill, height fill ] mainScreen
-                , Element.map MsgForThreads (Threads.View.view model.user.user model.threads)
+                [ el [ padding 0, width fill, height fill ] mainScreen
+                , Element.map MsgForThreads (Threads.View.view model.user.currentUser model.threads)
                 ]
     in
     case model.router.page of
@@ -37,4 +37,4 @@ renderRoute model =
             text "404 Not Found"
 
         ChatPage threadId ->
-            mainView (Element.map MsgForChat (Chat.View.view model.threads.threads threadId model.chat))
+            mainView (Element.map MsgForChat (Chat.View.view model.user threadId model.chat))

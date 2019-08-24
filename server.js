@@ -12,6 +12,7 @@ const app = express();
 app.set("view engine", "ejs");
 app.set("views", "./src");
 app.use(express.static("build"));
+app.use(express.json());
 
 let webpackMiddleware;
 if (process.env.NODE_ENV !== "production") {
@@ -47,6 +48,11 @@ app.get("/api/threads", (req, res) => {
 
 app.get("/api/messages/:threadId", (req, res) => {
   jsonResponse(res, facebook.client.getMessages(req.params.threadId, 30));
+});
+
+app.post("/api/messages/:threadId/send", (req, res) => {
+  const message = req.body.message;
+  jsonResponse(res, facebook.client.sendMessage(req.params.threadId, message));
 });
 
 const jsonResponse = (res, promise) =>

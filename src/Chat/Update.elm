@@ -1,6 +1,6 @@
 module Chat.Update exposing (init, update, updateChat)
 
-import Chat.Data exposing (fetchMessages)
+import Chat.Data exposing (fetchMessages, sendMessage)
 import Chat.Types exposing (..)
 import Dict
 import RemoteData exposing (..)
@@ -15,6 +15,7 @@ init : Return Chat.Types.Msg Model
 init =
     return
         { messages = Dict.empty
+        , draft = ""
         }
         Cmd.none
 
@@ -25,19 +26,14 @@ update msgFor model =
         Types.MsgForChat msg ->
             updateChat msg model
 
-        Types.MsgForRouter msg ->
-            case msg of
-                OnUrlChange url ->
-                    let
-                        page =
-                            Maybe.withDefault NotFound <| parse routes url
-                    in
-                    case page of
-                        ChatPage threadId ->
-                            return model (fetchMessages threadId)
-
-                        _ ->
-                            return model Cmd.none
+        Types.MsgForRouter (OnUrlChange url) ->
+            let
+                page =
+                    Maybe.withDefault NotFound <| parse routes url
+            in
+            case page of
+                ChatPage threadId ->
+                    return model (fetchMessages threadId)
 
                 _ ->
                     return model Cmd.none
@@ -58,3 +54,9 @@ updateChat msg model =
                     model.messages |> Dict.insert threadId messages
             in
             return { model | messages = messages_ } Cmd.none
+
+        UpdateDraft text ->
+            return { model | draft = text } Cmd.none
+
+        SendMessage threadId ->
+            return { model | draft = "" } (sendMessage threadId model.draft)

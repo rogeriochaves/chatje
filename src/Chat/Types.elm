@@ -6,6 +6,7 @@ import RemoteData exposing (..)
 
 type alias Model =
     { messages : Dict.Dict String (WebData (List Message))
+    , draft : String
     }
 
 
@@ -20,3 +21,5 @@ type alias Message =
 type Msg
     = NoOp
     | LoadedMessages String (WebData (List Message))
+    | UpdateDraft String
+    | SendMessage String

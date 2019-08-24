@@ -3,42 +3,96 @@ module Chat.View exposing (renderMessage, renderMessagesList, view)
 import Chat.Types exposing (..)
 import Dict
 import Element exposing (..)
+import Element.Input as Input
 import Html.Attributes
+import Html.Events
+import Json.Decode as Decode
 import RemoteData exposing (..)
 import Styles exposing (..)
-import Threads.Types exposing (Threads)
+import User.Data exposing (currentUser)
+import User.Types as User
 
 
-view : WebData Threads -> String -> Model -> Element Msg
-view threads threadId model =
-    column
-        [ width fill
-        , clipY
-        , scrollbarY
-        , htmlAttribute (Html.Attributes.style "height" "100vh")
+view : User.Model -> String -> Model -> Element Msg
+view user threadId model =
+    column [ width fill ]
+        [ column
+            [ width fill
+            , clipY
+            , scrollbarY
+            , clipX
+            , htmlAttribute (Html.Attributes.style "height" "calc(100vh - 50px)")
+            ]
+            [ renderMessagesList user (Dict.get threadId model.messages) ]
+        , el ([ width fill ] ++ Styles.messageBox)
+            (Input.text
+                ([ height (px 40)
+                 , onEnter (SendMessage threadId)
+                 ]
+                    ++ Styles.messageBoxInput
+                )
+                { onChange = UpdateDraft
+                , text = model.draft
+                , placeholder = Nothing
+                , label = Input.labelHidden "message to send"
+                }
+            )
         ]
-        [ renderMessagesList threads (Dict.get threadId model.messages) ]
 
 
-renderMessagesList : WebData Threads -> Maybe (WebData (List Message)) -> Element Msg
-renderMessagesList pendingThreads messages =
+renderMessagesList : User.Model -> Maybe (WebData (List Message)) -> Element Msg
+renderMessagesList user messages =
     el [ padding 10 ]
-        (case ( messages, pendingThreads ) of
-            ( Just (Success messages_), Success threads ) ->
-                column []
-                    (List.map (renderMessage threads) messages_)
+        (case messages of
+            Just (Success messages_) ->
+                column [ spacing 12 ]
+                    (List.map (renderMessage user) messages_)
 
-            ( Just (Failure _), _ ) ->
+            Just (Failure _) ->
                 text "Error on loading messages"
-
-            ( _, Failure _ ) ->
-                text "Error on loading threads"
 
             _ ->
                 text "Loading..."
         )
 
 
-renderMessage : Threads -> Message -> Element Msg
-renderMessage thread message =
-    paragraph [] [ text message.message ]
+renderMessage : User.Model -> Message -> Element Msg
+renderMessage user message =
+    let
+        authorName =
+            Dict.get message.authorId user.users
+                |> Maybe.map (\u -> u.name ++ ":")
+                |> Maybe.withDefault ""
+
+        authorStyle =
+            if Just message.authorId == (currentUser user |> Maybe.map .id) then
+                Styles.selfName
+
+            else
+                Styles.authorName
+    in
+    row [ spacing 12 ]
+        [ el ([ width (px 200), alignTop ] ++ authorStyle) (text authorName)
+        , paragraph
+            [ width (px 200)
+            , htmlAttribute (Html.Attributes.style "width" "calc(100vw - 550px)")
+            ]
+            [ text message.message ]
+        ]
+
+
+onEnter : msg -> Element.Attribute msg
+onEnter msg =
+    Element.htmlAttribute
+        (Html.Events.on "keyup"
+            (Decode.field "key" Decode.string
+                |> Decode.andThen
+                    (\key ->
+                        if key == "Enter" then
+                            Decode.succeed msg
+
+                        else
+                            Decode.fail "Not the enter key"
+                    )
+            )
+        )

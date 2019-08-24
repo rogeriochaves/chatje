@@ -9,6 +9,7 @@ try {
   client.loggedIn = true;
   client.httpApi.token = cached.httpApi;
   client.session.tokens = cached.session;
+  client.mqttApi.connect(client.session.tokens, client.session.deviceId);
   console.log("Credentials retrieved from cache");
 } catch (e) {}
 

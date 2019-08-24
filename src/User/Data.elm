@@ -1,4 +1,4 @@
-module User.Data exposing (decodeUser, fetchUser)
+module User.Data exposing (currentUser, decodeUser, fetchUser)
 
 import Array exposing (Array, map)
 import Dict exposing (Dict, map, toList)
@@ -26,3 +26,13 @@ decodeUser =
     Decoder.succeed User
         |> required "id" Decoder.string
         |> required "name" Decoder.string
+
+
+currentUser : Model -> Maybe User
+currentUser model =
+    case model.currentUser of
+        Success user ->
+            Just user
+
+        _ ->
+            Nothing

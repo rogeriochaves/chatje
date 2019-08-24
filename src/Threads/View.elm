@@ -21,28 +21,29 @@ view user model =
 
 renderThreadList : WebData User -> Model -> Element Msg
 renderThreadList pendingUser model =
-    el [ padding 10 ]
-        (case ( model.threads, pendingUser ) of
-            ( Success threads, Success user ) ->
-                column []
-                    (List.map (renderThread user) threads)
+    case ( model.threads, pendingUser ) of
+        ( Success threads, Success user ) ->
+            column [ width (maximum 260 <| fill) ]
+                (List.map (renderThread user) threads)
 
-            ( Failure _, _ ) ->
-                text "Error on loading threads"
+        ( Failure _, _ ) ->
+            el [ padding 8 ] (text "Error on loading threads")
 
-            ( _, Failure _ ) ->
-                text "Error on loading user"
+        ( _, Failure _ ) ->
+            el [ padding 8 ] (text "Error on loading user")
 
-            _ ->
-                text "Loading..."
-        )
+        _ ->
+            none
 
 
 renderThread : User -> Thread -> Element Msg
 renderThread user thread =
     let
         threadLink threadName =
-            link [ padding 8 ] { url = "/chat/" ++ thread.id, label = text threadName }
+            link [ padding 8 ]
+                { url = "/chat/" ++ thread.id
+                , label = paragraph [] [ text threadName ]
+                }
     in
     case thread.name of
         Just name ->

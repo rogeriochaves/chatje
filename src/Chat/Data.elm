@@ -1,4 +1,4 @@
-module Chat.Data exposing (decodeMessages, fetchMessages)
+module Chat.Data exposing (decodeMessages, fetchMessages, sendMessage)
 
 import Array exposing (Array, map)
 import Chat.Types exposing (..)
@@ -6,6 +6,7 @@ import Dict exposing (Dict, map, toList)
 import Http
 import Json.Decode as Decoder exposing (Decoder)
 import Json.Decode.Pipeline exposing (optional, required)
+import Json.Encode as Encoder
 import RemoteData exposing (..)
 
 
@@ -33,3 +34,21 @@ decodeMessage =
         |> required "timestamp" Decoder.int
         |> required "authorId" Decoder.string
         |> required "message" Decoder.string
+
+
+sendMessage : String -> String -> Cmd Msg
+sendMessage threadId message =
+    let
+        returnMsg =
+            RemoteData.fromResult >> always NoOp
+    in
+    Http.post
+        { url = "/api/messages/" ++ threadId ++ "/send"
+        , body =
+            Http.jsonBody
+                (Encoder.object
+                    [ ( "message", Encoder.string message )
+                    ]
+                )
+        , expect = Http.expectJson returnMsg decodeMessages
+        }

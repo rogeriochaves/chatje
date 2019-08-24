@@ -1,7 +1,9 @@
 module User.Update exposing (init, update, updateUser)
 
+import Dict
 import RemoteData exposing (..)
 import Return exposing (Return, return)
+import Threads.Types
 import Types
 import User.Data exposing (fetchUser)
 import User.Types exposing (..)
@@ -10,7 +12,8 @@ import User.Types exposing (..)
 init : Return Msg Model
 init =
     return
-        { user = Loading
+        { currentUser = Loading
+        , users = Dict.empty
         }
         fetchUser
 
@@ -20,6 +23,19 @@ update msgFor model =
     case msgFor of
         Types.MsgForUser msg ->
             updateUser msg model
+
+        Types.MsgForThreads (Threads.Types.LoadedThreads (Success threads)) ->
+            let
+                addUser { id, name } =
+                    Dict.insert id { id = id, name = name }
+
+                updatedUsers =
+                    List.foldl
+                        (\thread users -> List.foldl addUser users thread.participants)
+                        model.users
+                        threads
+            in
+            return { model | users = updatedUsers } Cmd.none
 
         _ ->
             return model Cmd.none
@@ -32,4 +48,4 @@ updateUser msg model =
             return model Cmd.none
 
         LoadedUser user ->
-            return { model | user = user } Cmd.none
+            return { model | currentUser = user } Cmd.none

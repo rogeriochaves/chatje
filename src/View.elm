@@ -1,6 +1,7 @@
 module View exposing (renderRoute, view)
 
 import Browser
+import Chat.View
 import Element exposing (..)
 import Element.Events exposing (..)
 import Element.Input exposing (button)
@@ -21,12 +22,19 @@ view model =
 
 renderRoute : Model -> Element Types.Msg
 renderRoute model =
-    case model.router.page of
-        Home ->
+    let
+        mainView mainScreen =
             row [ width fill, height fill ]
-                [ el [ width fill, height fill ] (text "Messages will go here")
+                [ el [ padding 8, width fill, height fill ] mainScreen
                 , Element.map MsgForThreads (Threads.View.view model.user.user model.threads)
                 ]
+    in
+    case model.router.page of
+        Home ->
+            mainView (text "Select some thread")
 
         NotFound ->
             text "404 Not Found"
+
+        ChatPage threadId ->
+            mainView (Element.map MsgForChat (Chat.View.view model.threads.threads threadId model.chat))

@@ -24,9 +24,7 @@ renderThreadList pendingUser model =
     el [ padding 10 ]
         (case ( model.threads, pendingUser ) of
             ( Success threads, Success user ) ->
-                column
-                    [ spacing 8
-                    ]
+                column []
                     (List.map (renderThread user) threads)
 
             ( Failure _, _ ) ->
@@ -42,9 +40,13 @@ renderThreadList pendingUser model =
 
 renderThread : User -> Thread -> Element Msg
 renderThread user thread =
+    let
+        threadLink threadName =
+            link [ padding 8 ] { url = "/chat/" ++ thread.id, label = text threadName }
+    in
     case thread.name of
         Just name ->
-            paragraph [ width (px 260) ] [ text name ]
+            threadLink name
 
         Nothing ->
             let
@@ -58,4 +60,4 @@ renderThread user thread =
                 Element.none
 
             else
-                paragraph [ width (px 260) ] [ text threadName ]
+                threadLink threadName

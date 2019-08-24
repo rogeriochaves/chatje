@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node-dev server.js",
     "start:prod": "NODE_ENV=production node server.js",
     "build": "mkdir -p build && webpack --mode=production --progress --json > build/stats.json",
     "test": "elm-test"
@@ -23,6 +23,7 @@
     "express": "^4.16.3",
     "jsdom": "^11.12.0",
     "libfb": "^2.3.4",
+    "node-dev": "^4.0.0",
     "yargs": "^12.0.1"
   }
 }

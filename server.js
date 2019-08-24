@@ -35,20 +35,22 @@ app.get("/sso", (req, res) => {
 });
 
 app.get("/api/user", (req, res) => {
-  facebook.client
-    .getUserInfo(facebook.client.session.tokens.uid)
-    .then(x => {
-      res.setHeader("Content-Type", "application/json");
-      res.end(JSON.stringify(x));
-    })
-    .catch(err => {
-      res.status(500).send(err.message);
-    });
+  jsonResponse(
+    res,
+    facebook.client.getUserInfo(facebook.client.session.tokens.uid)
+  );
 });
 
 app.get("/api/threads", (req, res) => {
-  facebook.client
-    .getThreadList(100)
+  jsonResponse(res, facebook.client.getThreadList(100));
+});
+
+app.get("/api/messages/:threadId", (req, res) => {
+  jsonResponse(res, facebook.client.getMessages(req.params.threadId, 30));
+});
+
+const jsonResponse = (res, promise) =>
+  promise
     .then(x => {
       res.setHeader("Content-Type", "application/json");
       res.end(JSON.stringify(x));
@@ -56,7 +58,6 @@ app.get("/api/threads", (req, res) => {
     .catch(err => {
       res.status(500).send(err.message);
     });
-});
 
 app.get("*", (req, res) => {
   if (!facebook.isLoggedIn()) {
@@ -74,7 +75,7 @@ const getBundle = res => {
     bundlePath = require("./build/stats.json").assetsByChunkName.main;
     file = fs.readFileSync(`./build/${bundlePath}`, "utf8");
   } else {
-    bundlePath = res.locals.webpackStats.toJson().assetsByChunkName.main;
+    bundlePath = "/" + res.locals.webpackStats.toJson().assetsByChunkName.main;
     file = webpackMiddleware.fileSystem.readFileSync(
       path.join(process.cwd(), "build", bundlePath),
       "utf8"

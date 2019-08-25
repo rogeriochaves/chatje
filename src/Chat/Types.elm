@@ -14,6 +14,8 @@ type alias Message =
     { timestamp : Int
     , authorId : String
     , message : String
+    , stickerId : Maybe String
+    , attachment : Maybe String
     }
 
 

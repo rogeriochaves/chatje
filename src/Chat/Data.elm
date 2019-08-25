@@ -33,6 +33,14 @@ decodeMessage =
         |> required "timestamp" Decoder.int
         |> required "authorId" Decoder.string
         |> required "message" Decoder.string
+        |> required "stickerId" (Decoder.nullable (Decoder.field "id" Decoder.string))
+        |> required "fileAttachments"
+            (Decoder.oneOf
+                [ Decoder.list (Decoder.field "url" Decoder.string)
+                    |> Decoder.map List.head
+                , Decoder.succeed Nothing
+                ]
+            )
 
 
 sendMessage : String -> String -> String -> Cmd Msg

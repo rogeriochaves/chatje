@@ -71,6 +71,33 @@ renderMessage user message =
 
             else
                 Styles.authorName
+
+        textMessage =
+            case ( message.stickerId, message.attachment ) of
+                ( Just stickerId, _ ) ->
+                    if stickerId == "369239263222822" then
+                        [ text <| "👍" ++ message.message ]
+
+                    else
+                        [ text <| "<sticker " ++ stickerId ++ "> " ++ message.message ]
+
+                ( Nothing, Just attachment ) ->
+                    [ image
+                        [ height (shrink |> maximum 300)
+                        , width (shrink |> maximum 500)
+                        ]
+                        { src = attachment
+                        , description = message.message
+                        }
+                    , text message.message
+                    ]
+
+                ( Nothing, Nothing ) ->
+                    if message.message == "" then
+                        [ text "<not implemented yet>" ]
+
+                    else
+                        [ text message.message ]
     in
     row [ spacing 12 ]
         [ el ([ width (px 200), alignTop ] ++ authorStyle) (text authorName)
@@ -78,5 +105,5 @@ renderMessage user message =
             [ width (px 200)
             , htmlAttribute (Html.Attributes.style "width" "calc(100vw - 550px)")
             ]
-            [ text message.message ]
+            textMessage
         ]

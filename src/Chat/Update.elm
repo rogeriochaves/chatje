@@ -74,7 +74,12 @@ updateChat user msg model =
         NewMessage { threadId, timestamp, authorId, message } ->
             let
                 newMessage =
-                    { timestamp = timestamp, authorId = authorId, message = message }
+                    { timestamp = timestamp
+                    , authorId = authorId
+                    , message = message
+                    , stickerId = Nothing
+                    , attachment = Nothing
+                    }
 
                 updatedMessageList =
                     case Dict.get threadId model.messages of

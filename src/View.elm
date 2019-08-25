@@ -2,6 +2,7 @@ module View exposing (renderRoute, view)
 
 import Browser
 import Chat.View
+import Dict
 import Element exposing (..)
 import Element.Events exposing (..)
 import Element.Input exposing (button)
@@ -31,21 +32,27 @@ renderRoute model =
                 , Element.map MsgForThreads (Threads.View.view model.user.currentUser model.threads)
                 ]
 
-        showLoading view_ =
-            case ( model.user.currentUser, model.threads.threads ) of
-                ( Loading, _ ) ->
+        showLoading inChat view_ =
+            case ( model.user.currentUser, model.threads.threads, inChat ) of
+                ( Loading, _, _ ) ->
                     el [ centerX, centerY ] (text "Loading...")
 
-                ( _, Loading ) ->
+                ( _, Loading, _ ) ->
                     el [ centerX, centerY ] (text "Loading...")
+
+                ( _, _, True ) ->
+                    if model.chat.messages == Dict.empty then
+                        el [ centerX, centerY ] (text "Loading...")
+                    else
+                        view_
 
                 _ ->
                     view_
     in
     case model.router.page of
         Home ->
-            mainView (el [ centerY, centerX ] (text "Select a thread"))
-                |> showLoading
+            mainView Element.none
+                |> showLoading False
 
         Login ->
             Element.map MsgForUser (User.View.login model.user)
@@ -55,4 +62,4 @@ renderRoute model =
 
         ChatPage threadId ->
             mainView (Element.map MsgForChat (Chat.View.view model.user threadId model.chat))
-                |> showLoading
+                |> showLoading True

@@ -6,6 +6,7 @@ import RemoteData exposing (..)
 import Return exposing (Return, return)
 import Router.Routes exposing (..)
 import Router.Types exposing (..)
+import Threads.Types
 import Types
 import Url exposing (Url)
 import Url.Parser exposing (parse)
@@ -25,6 +26,14 @@ update msgFor model =
     case msgFor of
         Types.MsgForRouter msg ->
             updateRouter msg model
+
+        Types.MsgForThreads (Threads.Types.LoadedThreads (Success threads)) ->
+            case ( model.page, List.head threads ) of
+                ( Home, Just thread ) ->
+                    return model <| pushUrl model.key (toPath <| ChatPage thread.id)
+
+                _ ->
+                    return model Cmd.none
 
         _ ->
             return model Cmd.none

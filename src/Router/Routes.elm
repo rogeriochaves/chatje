@@ -31,7 +31,7 @@ toPath page =
             "/404"
 
         ChatPage threadId ->
-            "/chat"
+            "/chat/" ++ threadId
 
         Login ->
             "/login"

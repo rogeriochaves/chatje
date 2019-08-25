@@ -29,3 +29,4 @@ type alias Participant =
 type Msg
     = NoOp
     | LoadedThreads (WebData Threads)
+    | RefreshThreads

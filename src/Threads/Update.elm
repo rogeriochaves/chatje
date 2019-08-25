@@ -90,3 +90,6 @@ updateThreads msg model =
 
         LoadedThreads threads ->
             return { model | threads = threads } Cmd.none
+
+        RefreshThreads ->
+            return model fetchThreads

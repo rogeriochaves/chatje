@@ -4,12 +4,20 @@ import Chat.Types
 import Json.Decode exposing (..)
 import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode
+import Threads.Types
+import Time
 import Types exposing (..)
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    fbEvent decodeEvent
+    let
+      tenMinutes = 10 * 60 * 1000
+    in
+    Sub.batch
+        [ fbEvent decodeEvent
+        , Time.every tenMinutes (\_ -> MsgForThreads Threads.Types.RefreshThreads)
+        ]
 
 
 decodeEvent : Json.Encode.Value -> Msg

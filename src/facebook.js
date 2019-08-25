@@ -4,38 +4,43 @@ const fs = require("fs");
 
 let verifier = null;
 let client = new Client();
-try {
-  // TODO: add an expiration date for the cache
-  const cached = JSON.parse(
-    fs.readFileSync("/tmp/.workchat_credentials_cache").toString()
-  );
-  client.loggedIn = true;
-  client.httpApi.token = cached.httpApi;
-  client.session.tokens = cached.session;
 
-  // TODO: lines below are basically a copy-paste from the Client.js doLogin function in libfb,
-  // extracting it to a common function would probably be better
-  client.mqttApi.on("publish", publish => {
-    if (publish.topic === "/send_message_response") {
-      const response = JSON.parse(publish.data.toString("utf8"));
-      client.mqttApi.emit("sentMessage:" + response.msgid, response);
-    }
-    if (publish.topic === "/t_ms")
-      client.handleMS(publish.data.toString("utf8"));
-  });
-  client.mqttApi.on("connected", async () => {
-    let { viewer } = await client.httpApi.querySeqId();
-    const seqId = viewer.message_threads.sync_sequence_id;
-    client.seqId = seqId;
-    if (!client.session.tokens.syncToken) {
+const recoverCache = () => {
+  try {
+    const cached = JSON.parse(
+      fs.readFileSync("/tmp/.workchat_credentials_cache").toString()
+    );
+    const credentialsExpiration = 1000 * 60 * 60 * 72; // 3 days
+    if (Date.now() - cached.timestamp > credentialsExpiration) return;
+    client.loggedIn = true;
+    client.httpApi.token = cached.httpApi;
+    client.session.tokens = cached.session;
+
+    // TODO: lines below are basically a copy-paste from the Client.js doLogin function in libfb,
+    // extracting it to a common function would probably be better
+    client.mqttApi.on("publish", publish => {
+      if (publish.topic === "/send_message_response") {
+        const response = JSON.parse(publish.data.toString("utf8"));
+        client.mqttApi.emit("sentMessage:" + response.msgid, response);
+      }
+      if (publish.topic === "/t_ms")
+        client.handleMS(publish.data.toString("utf8"));
+    });
+    client.mqttApi.on("connected", async () => {
+      let { viewer } = await client.httpApi.querySeqId();
+      const seqId = viewer.message_threads.sync_sequence_id;
+      client.seqId = seqId;
+      if (!client.session.tokens.syncToken) {
+        await client.createQueue(seqId);
+        return;
+      }
       await client.createQueue(seqId);
-      return;
-    }
-    await client.createQueue(seqId);
-  });
-  client.mqttApi.connect(client.session.tokens, client.session.deviceId);
-  console.log("Credentials retrieved from cache");
-} catch (e) {}
+    });
+    client.mqttApi.connect(client.session.tokens, client.session.deviceId);
+    console.log("Credentials retrieved from cache");
+  } catch (e) {}
+};
+recoverCache();
 
 const base64URLEncode = str => {
   return str
@@ -73,7 +78,8 @@ const loginAuth = (uid, nonce) => {
       "/tmp/.workchat_credentials_cache",
       JSON.stringify({
         session: client.session.tokens,
-        httpApi: client.httpApi.token
+        httpApi: client.httpApi.token,
+        timestamp: Date.now()
       })
     );
   });

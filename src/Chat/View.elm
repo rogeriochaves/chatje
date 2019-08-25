@@ -43,17 +43,17 @@ view user threadId model =
 
 renderMessagesList : User.Model -> Maybe (WebData (List Message)) -> Element Msg
 renderMessagesList user messages =
-    el [ padding 10 ]
+    el [ padding 10, width fill, height fill ]
         (case messages of
             Just (Success messages_) ->
                 column [ spacing 12 ]
                     (List.map (renderMessage user) messages_)
 
             Just (Failure _) ->
-                text "Error on loading messages"
+                el [ centerX, centerY ] (text "Error on loading messages")
 
             _ ->
-                text "Loading..."
+                el [ centerX, centerY ] (text "Loading...")
         )
 
 

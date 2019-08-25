@@ -6,6 +6,7 @@ import Element exposing (..)
 import Element.Events exposing (..)
 import Element.Input exposing (button)
 import Element.Region exposing (..)
+import RemoteData exposing (..)
 import Router.Routes exposing (..)
 import Router.Types exposing (Msg(..))
 import Styles
@@ -29,10 +30,22 @@ renderRoute model =
                 [ el [ padding 0, width fill, height fill ] mainScreen
                 , Element.map MsgForThreads (Threads.View.view model.user.currentUser model.threads)
                 ]
+
+        showLoading view_ =
+            case ( model.user.currentUser, model.threads.threads ) of
+                ( Loading, _ ) ->
+                    el [ centerX, centerY ] (text "Loading...")
+
+                ( _, Loading ) ->
+                    el [ centerX, centerY ] (text "Loading...")
+
+                _ ->
+                    view_
     in
     case model.router.page of
         Home ->
             mainView (el [ centerY, centerX ] (text "Select a thread"))
+                |> showLoading
 
         Login ->
             Element.map MsgForUser (User.View.login model.user)
@@ -42,3 +55,4 @@ renderRoute model =
 
         ChatPage threadId ->
             mainView (Element.map MsgForChat (Chat.View.view model.user threadId model.chat))
+                |> showLoading

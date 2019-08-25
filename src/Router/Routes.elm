@@ -1,6 +1,7 @@
-module Router.Routes exposing (Page(..), routes, toPath)
+module Router.Routes exposing (Page(..), parseUrl, routes, toPath)
 
 import Browser.Navigation
+import Url exposing (Url)
 import Url.Parser exposing ((</>), Parser, map, oneOf, parse, s, string, top)
 
 
@@ -35,3 +36,8 @@ toPath page =
 
         Login ->
             "/login"
+
+
+parseUrl : Url -> Page
+parseUrl url =
+    Maybe.withDefault NotFound <| parse routes url

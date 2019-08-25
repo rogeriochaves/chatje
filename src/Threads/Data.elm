@@ -4,7 +4,7 @@ import Array exposing (Array, map)
 import Dict exposing (Dict, map, toList)
 import Http
 import Json.Decode as Decoder exposing (Decoder)
-import Json.Decode.Pipeline exposing (optional, required)
+import Json.Decode.Pipeline exposing (optional, required, hardcoded)
 import RemoteData exposing (..)
 import Threads.Types exposing (..)
 
@@ -32,6 +32,7 @@ decodeThread =
         |> required "id" Decoder.string
         |> required "name" (Decoder.nullable Decoder.string)
         |> required "participants" (Decoder.list decodeParticipant)
+        |> hardcoded False
 
 
 decodeParticipant : Decoder.Decoder Participant

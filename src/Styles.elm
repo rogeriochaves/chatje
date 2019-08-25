@@ -1,4 +1,4 @@
-module Styles exposing (authorName, body, button, fieldInput, messageBox, messageBoxInput, selfName)
+module Styles exposing (authorName, body, button, fieldInput, messageBox, messageBoxInput, selfName, unreadThread)
 
 import Element exposing (..)
 import Element.Background as Background
@@ -58,5 +58,10 @@ fieldInput =
 button : List (Attribute msg)
 button =
     [ Border.color (rgb255 255 255 255)
-    , Border.width 1
+    ]
+
+
+unreadThread : List (Attribute msg)
+unreadThread =
+    [ Font.color (rgb255 196 175 117)
     ]

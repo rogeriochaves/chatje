@@ -3,7 +3,7 @@ module Threads.View exposing (renderThread, view)
 import Element exposing (..)
 import Html.Attributes
 import RemoteData exposing (..)
-import Styles exposing (..)
+import Styles
 import Threads.Types exposing (..)
 import User.Types exposing (User)
 
@@ -39,8 +39,15 @@ renderThreadList pendingUser model =
 renderThread : User -> Thread -> Element Msg
 renderThread user thread =
     let
+        threadStyle =
+            if thread.unread then
+                Styles.unreadThread
+
+            else
+                []
+
         threadLink threadName =
-            link [ padding 8 ]
+            link ([ padding 8 ] ++ threadStyle)
                 { url = "/chat/" ++ thread.id
                 , label = paragraph [] [ text threadName ]
                 }

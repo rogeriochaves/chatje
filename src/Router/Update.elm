@@ -43,12 +43,16 @@ updateRouter : Msg -> Model -> Return Msg Model
 updateRouter msg model =
     case msg of
         OnUrlChange url ->
-            return { model | page = Maybe.withDefault NotFound <| parse routes url } Cmd.none
+            return { model | page = parseUrl url } Cmd.none
 
         OnUrlRequest urlRequest ->
             case urlRequest of
                 Internal url ->
-                    ( model, pushUrl model.key <| Url.toString url )
+                    if parseUrl url == model.page then
+                        ( model, Cmd.none )
+
+                    else
+                        ( model, pushUrl model.key <| Url.toString url )
 
                 External url ->
                     ( model, load url )

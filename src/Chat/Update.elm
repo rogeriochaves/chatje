@@ -31,11 +31,7 @@ update user msgFor model =
             updateChat user msg model
 
         Types.MsgForRouter (OnUrlChange url) ->
-            let
-                page =
-                    Maybe.withDefault NotFound <| parse routes url
-            in
-            case page of
+            case parseUrl url of
                 ChatPage threadId ->
                     return model
                         (Cmd.batch

@@ -16,6 +16,7 @@ type alias Thread =
     { id : String
     , name : Maybe String
     , participants : List Participant
+    , unread : Bool
     }
 
 

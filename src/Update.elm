@@ -26,7 +26,7 @@ update : Msg -> (Model -> Return Msg Model)
 update msg model =
     singleton Model
         |> andMapCmd MsgForRouter (Router.Update.update msg model.router)
-        |> andMapCmd MsgForThreads (Threads.Update.update msg model.threads)
+        |> andMapCmd MsgForThreads (Threads.Update.update model.router.page msg model.threads)
         |> andMapCmd MsgForUser (User.Update.update msg model.user)
         |> andMapCmd MsgForChat (Chat.Update.update model.user msg model.chat)
 

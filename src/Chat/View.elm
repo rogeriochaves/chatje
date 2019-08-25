@@ -46,7 +46,7 @@ renderMessagesList user messages =
     el [ padding 10, width fill, height fill ]
         (case messages of
             Just (Success messages_) ->
-                column [ spacing 12 ]
+                column [ spacing 12, alignBottom ]
                     (List.map (renderMessage user) messages_)
 
             Just (Failure _) ->

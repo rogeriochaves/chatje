@@ -99,7 +99,7 @@ const getBundle = res => {
   let bundlePath;
   let file;
   if (process.env.NODE_ENV === "development") {
-    bundlePath = "/" + res.locals.webpackStats.toJson().assetsByChunkName.main;
+    bundlePath = res.locals.webpackStats.toJson().assetsByChunkName.main;
     file = webpackMiddleware.fileSystem.readFileSync(
       path.join(process.cwd(), "build", bundlePath),
       "utf8"
@@ -109,7 +109,7 @@ const getBundle = res => {
       .main;
     file = fs.readFileSync(`${__dirname}/build/${bundlePath}`, "utf8");
   }
-  return { path: bundlePath, file };
+  return { path: `/${bundlePath}`, file };
 };
 
 let listenersSet = false;

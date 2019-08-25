@@ -5,11 +5,36 @@ const fs = require("fs");
 let verifier = null;
 let client = new Client();
 try {
+  // TODO: add an expiration date for the cache
   const cached = JSON.parse(fs.readFileSync(".credentials_cache").toString());
   client.loggedIn = true;
   client.httpApi.token = cached.httpApi;
   client.session.tokens = cached.session;
-  client.mqttApi.connect(client.session.tokens, client.session.deviceId);
+
+  // TODO: lines below are basically a copy-paste from the Client.js doLogin function in libfb,
+  // extracting it to a common function would probably be better
+  client.mqttApi.on("publish", publish => {
+    if (publish.topic === "/send_message_response") {
+      const response = JSON.parse(publish.data.toString("utf8"));
+      client.mqttApi.emit("sentMessage:" + response.msgid, response);
+    }
+    if (publish.topic === "/t_ms")
+      client.handleMS(publish.data.toString("utf8"));
+  });
+  client.mqttApi.on("connected", async () => {
+    let { viewer } = await client.httpApi.querySeqId();
+    const seqId = viewer.message_threads.sync_sequence_id;
+    client.seqId = seqId;
+    if (!client.session.tokens.syncToken) {
+      await client.createQueue(seqId);
+      return;
+    }
+    await client.createQueue(seqId);
+  });
+  client.mqttApi
+    .connect(client.session.tokens, client.session.deviceId)
+    .then(res => console.log("res connect", res))
+    .catch(err => console.log("err connect", err));
   console.log("Credentials retrieved from cache");
 } catch (e) {}
 
@@ -45,8 +70,6 @@ const isLoggedIn = () => {
 
 const loginAuth = (uid, nonce) => {
   client.login(uid, `${nonce}:${verifier}`).then(() => {
-    // console.log(client.session);
-    // fs.writeFileSync(".client_cache", serialize(client));
     fs.writeFileSync(
       ".credentials_cache",
       JSON.stringify({
@@ -54,10 +77,6 @@ const loginAuth = (uid, nonce) => {
         httpApi: client.httpApi.token
       })
     );
-    // console.log(client.getSession().tokens);
-    // client.getThreadList().then(x => {
-    //   console.log(x);
-    // });
   });
 };
 

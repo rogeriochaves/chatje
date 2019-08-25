@@ -30,17 +30,24 @@ decodeMessages =
 decodeMessage : Decoder.Decoder Message
 decodeMessage =
     Decoder.succeed Message
-        |> required "id" Decoder.string
         |> required "timestamp" Decoder.int
         |> required "authorId" Decoder.string
         |> required "message" Decoder.string
 
 
-sendMessage : String -> String -> Cmd Msg
-sendMessage threadId message =
+sendMessage : String -> String -> String -> Cmd Msg
+sendMessage currentUserId threadId message =
     let
         returnMsg =
-            RemoteData.fromResult >> always NoOp
+            RemoteData.fromResult
+                >> always
+                    (NewMessage
+                        { threadId = threadId
+                        , message = message
+                        , authorId = currentUserId
+                        , timestamp = 0
+                        }
+                    )
     in
     Http.post
         { url = "/api/messages/" ++ threadId ++ "/send"

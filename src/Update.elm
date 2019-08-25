@@ -28,7 +28,7 @@ update msg model =
         |> andMapCmd MsgForRouter (Router.Update.update msg model.router)
         |> andMapCmd MsgForThreads (Threads.Update.update msg model.threads)
         |> andMapCmd MsgForUser (User.Update.update msg model.user)
-        |> andMapCmd MsgForChat (Chat.Update.update msg model.chat)
+        |> andMapCmd MsgForChat (Chat.Update.update model.user msg model.chat)
 
 
 andMapCmd : (msg1 -> msg2) -> (Return msg1 model1 -> (Return msg2 (model1 -> model2) -> Return msg2 model2))

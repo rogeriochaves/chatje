@@ -1,9 +1,10 @@
-module Main exposing (main)
+port module Main exposing (main)
 
 import Browser
 import Html exposing (..)
 import Html.Events exposing (onClick)
 import Router.Types
+import Subscriptions exposing (subscriptions)
 import Types exposing (..)
 import Update exposing (init, update)
 import View exposing (view)
@@ -15,7 +16,7 @@ main =
         { init = init
         , view = view
         , update = update
-        , subscriptions = always Sub.none
+        , subscriptions = subscriptions
         , onUrlChange = MsgForRouter << Router.Types.OnUrlChange
         , onUrlRequest = MsgForRouter << Router.Types.OnUrlRequest
         }

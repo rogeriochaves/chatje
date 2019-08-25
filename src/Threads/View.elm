@@ -58,7 +58,7 @@ renderThread user thread =
                         |> String.join ", "
             in
             if threadName == "" then
-                Element.none
+                threadLink user.name
 
             else
                 threadLink threadName

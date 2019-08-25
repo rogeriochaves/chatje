@@ -22,6 +22,7 @@ view user threadId model =
             , scrollbarY
             , clipX
             , htmlAttribute (Html.Attributes.style "height" "calc(100vh - 50px)")
+            , htmlAttribute (Html.Attributes.id "chat")
             ]
             [ renderMessagesList user (Dict.get threadId model.messages) ]
         , el ([ width fill ] ++ Styles.messageBox)

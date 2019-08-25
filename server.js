@@ -7,12 +7,17 @@ const { JSDOM } = require("jsdom");
 const { Script } = require("vm");
 const PORT = args.port || process.env.PORT || 8080;
 const facebook = require("./src/facebook");
+const socketio = require("socket.io");
+const http = require("http");
 
 const app = express();
 app.set("view engine", "ejs");
 app.set("views", "./src");
 app.use(express.static("build"));
 app.use(express.json());
+
+const server = http.createServer(app);
+const io = socketio(server);
 
 let webpackMiddleware;
 if (process.env.NODE_ENV !== "production") {
@@ -90,23 +95,16 @@ const getBundle = res => {
   return { path: bundlePath, file };
 };
 
-const renderElmApp = (bundleFile, url) =>
-  new Promise((resolve, reject) => {
-    const dom = new JSDOM(`<!DOCTYPE html><html><body></body></html>`, {
-      url,
-      runScripts: "outside-only"
-    });
-    try {
-      dom.runVMScript(new Script(bundleFile));
-    } catch (err) {
-      reject(err);
-    }
-
-    setTimeout(() => {
-      resolve(dom.window.document.body.innerHTML);
-    }, 1);
+let listenersSet = false;
+io.on("connection", function(socket) {
+  if (listenersSet) return;
+  facebook.client.on("message", message => {
+    io.emit("fbEvent", { type: "message", payload: message });
   });
 
-app.listen(PORT, "0.0.0.0", () =>
+  listenersSet = true;
+});
+
+server.listen(PORT, "0.0.0.0", () =>
   console.log(`BasicMessenger listening on port http://localhost:${PORT}`)
 );

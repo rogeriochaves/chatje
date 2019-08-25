@@ -1,4 +1,4 @@
-module Chat.Types exposing (Message, Model, Msg(..))
+module Chat.Types exposing (Message, Model, Msg(..), NewMessagePayload)
 
 import Dict
 import RemoteData exposing (..)
@@ -11,7 +11,14 @@ type alias Model =
 
 
 type alias Message =
-    { id : String
+    { timestamp : Int
+    , authorId : String
+    , message : String
+    }
+
+
+type alias NewMessagePayload =
+    { threadId : String
     , timestamp : Int
     , authorId : String
     , message : String
@@ -23,3 +30,4 @@ type Msg
     | LoadedMessages String (WebData (List Message))
     | UpdateDraft String
     | SendMessage String
+    | NewMessage NewMessagePayload

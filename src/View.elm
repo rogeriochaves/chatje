@@ -11,6 +11,7 @@ import Router.Types exposing (Msg(..))
 import Styles
 import Threads.View
 import Types exposing (..)
+import User.View
 
 
 view : Model -> Browser.Document Types.Msg
@@ -31,7 +32,10 @@ renderRoute model =
     in
     case model.router.page of
         Home ->
-            mainView (text "Select some thread")
+            mainView (el [ centerY, centerX ] (text "Select a thread"))
+
+        Login ->
+            Element.map MsgForUser (User.View.login model.user)
 
         NotFound ->
             text "404 Not Found"

@@ -1,4 +1,4 @@
-module Styles exposing (authorName, body, messageBox, messageBoxInput, selfName)
+module Styles exposing (authorName, body, button, fieldInput, messageBox, messageBoxInput, selfName)
 
 import Element exposing (..)
 import Element.Background as Background
@@ -46,6 +46,17 @@ messageBoxInput : List (Attribute msg)
 messageBoxInput =
     [ Background.color (rgb255 32 32 32)
     , Border.width 0
+    ]
 
-    -- , htmlAttribute (Html.Attributes.style "word-wrap" "break-word")
+
+fieldInput : List (Attribute msg)
+fieldInput =
+    [ Font.color (rgb255 0 0 0)
+    ]
+
+
+button : List (Attribute msg)
+button =
+    [ Border.color (rgb255 255 255 255)
+    , Border.width 1
     ]

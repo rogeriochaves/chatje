@@ -7,6 +7,7 @@ import RemoteData exposing (..)
 type alias Model =
     { currentUser : WebData User
     , users : Users
+    , email : String
     }
 
 
@@ -23,3 +24,5 @@ type alias User =
 type Msg
     = NoOp
     | LoadedUser (WebData User)
+    | UpdateEmail String
+    | Login

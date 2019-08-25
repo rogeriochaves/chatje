@@ -8,6 +8,7 @@ type Page
     = Home
     | NotFound
     | ChatPage String
+    | Login
 
 
 routes : Parser (Page -> a) a
@@ -16,6 +17,7 @@ routes =
         [ map Home top
         , map NotFound (s "404")
         , map ChatPage (s "chat" </> string)
+        , map Login (s "login")
         ]
 
 
@@ -30,3 +32,6 @@ toPath page =
 
         ChatPage threadId ->
             "/chat"
+
+        Login ->
+            "/login"

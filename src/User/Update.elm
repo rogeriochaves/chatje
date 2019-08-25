@@ -1,5 +1,6 @@
 module User.Update exposing (init, update, updateUser)
 
+import Browser.Navigation exposing (load)
 import Dict
 import RemoteData exposing (..)
 import Return exposing (Return, return)
@@ -14,6 +15,7 @@ init =
     return
         { currentUser = Loading
         , users = Dict.empty
+        , email = ""
         }
         fetchUser
 
@@ -49,3 +51,9 @@ updateUser msg model =
 
         LoadedUser user ->
             return { model | currentUser = user } Cmd.none
+
+        UpdateEmail email ->
+            return { model | email = email } Cmd.none
+
+        Login ->
+            return model (load <| "/do-login?email=" ++ model.email)

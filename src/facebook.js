@@ -50,12 +50,12 @@ const sha256 = buffer => {
     .digest();
 };
 
-const loginStart = () => {
+const loginStart = rawEmail => {
   verifier = base64URLEncode(crypto.randomBytes(32));
 
   const challenge = base64URLEncode(sha256(verifier));
   const req_id = base64URLEncode(crypto.randomBytes(3));
-  const email = encodeURIComponent(process.env.USER_EMAIL);
+  const email = encodeURIComponent(rawEmail);
 
   const responseUrl = encodeURIComponent("fb-workchat-sso://sso");
   return `https://m.facebook.com/work/sso/mobile?app_id=312713275593566&response_url=${responseUrl}&request_id=${req_id}&code_challenge=${challenge}&email=${email}`;
@@ -66,7 +66,7 @@ const isLoggedIn = () => {
 };
 
 const loginAuth = (uid, nonce) => {
-  client.login(uid, `${nonce}:${verifier}`).then(() => {
+  return client.login(uid, `${nonce}:${verifier}`).then(() => {
     fs.writeFileSync(
       ".credentials_cache",
       JSON.stringify({

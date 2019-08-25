@@ -5,12 +5,12 @@ import Dict
 import Element exposing (..)
 import Element.Input as Input
 import Html.Attributes
-import Html.Events
 import Json.Decode as Decode
 import RemoteData exposing (..)
 import Styles exposing (..)
 import User.Data exposing (currentUser)
 import User.Types as User
+import Utils exposing (onEnter)
 
 
 view : User.Model -> String -> Model -> Element Msg
@@ -80,20 +80,3 @@ renderMessage user message =
             ]
             [ text message.message ]
         ]
-
-
-onEnter : msg -> Element.Attribute msg
-onEnter msg =
-    Element.htmlAttribute
-        (Html.Events.on "keyup"
-            (Decode.field "key" Decode.string
-                |> Decode.andThen
-                    (\key ->
-                        if key == "Enter" then
-                            Decode.succeed msg
-
-                        else
-                            Decode.fail "Not the enter key"
-                    )
-            )
-        )

@@ -17,7 +17,6 @@ class HttpApi extends BaseHttpApi_1.default {
   auth(email, password) {
     return tslib_1.__awaiter(this, void 0, void 0, function*() {
       var [pass, code_verifier] = password.split(":");
-      console.log("i am hear", email, pass, code_verifier);
       return this.post(
         new HttpApiRequest_1.default({
           url: "https://b-api.facebook.com/method/auth.login",
@@ -27,7 +26,6 @@ class HttpApi extends BaseHttpApi_1.default {
             email,
             password: pass,
             code_verifier,
-            community_id: process.env.COMMUNITY_ID,
             credentials_type: "work_sso_nonce"
           }
         })

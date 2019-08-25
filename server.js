@@ -34,10 +34,25 @@ if (process.env.NODE_ENV !== "production") {
   app.use(webpackMiddleware);
 }
 
+app.get("/do-login", (req, res) => {
+  const { email } = req.query;
+  if (!facebook.isLoggedIn()) {
+    const url = facebook.loginStart(email);
+    return res.redirect(url);
+  }
+  res.redirect("/");
+});
+
 app.get("/sso", (req, res) => {
   const { uid, nonce } = req.query;
-  facebook.loginAuth(uid, nonce);
-  res.send("amazing!");
+  facebook
+    .loginAuth(uid, nonce)
+    .then(() => {
+      setTimeout(() => res.redirect("/"), 2000);
+    })
+    .catch(err => {
+      res.status(500).send(err.message);
+    });
 });
 
 app.get("/api/user", (req, res) => {
@@ -71,9 +86,8 @@ const jsonResponse = (res, promise) =>
     });
 
 app.get("*", (req, res) => {
-  if (!facebook.isLoggedIn()) {
-    const url = facebook.loginStart();
-    return res.redirect(url);
+  if (req.path !== "/login" && !facebook.isLoggedIn()) {
+    return res.redirect("/login");
   }
   const bundle = getBundle(res);
   res.render("index", { bundlePath: bundle.path, renderedHtml: "" });

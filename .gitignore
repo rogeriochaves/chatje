@@ -1,4 +1,5 @@
 elm-stuff
 node_modules
 .env
-.credentials_cache
+build
+out

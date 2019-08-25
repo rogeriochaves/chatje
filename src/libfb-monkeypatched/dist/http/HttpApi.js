@@ -30,7 +30,6 @@ class HttpApi extends BaseHttpApi_1.default {
           }
         })
       ).then(res => {
-        console.log(res);
         if (!res.access_token) {
           const error = new Errors_1.AuthAPIError(res.error_msg);
           error.code = res.error_code;

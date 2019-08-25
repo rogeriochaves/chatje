@@ -6,7 +6,9 @@ let verifier = null;
 let client = new Client();
 try {
   // TODO: add an expiration date for the cache
-  const cached = JSON.parse(fs.readFileSync(".credentials_cache").toString());
+  const cached = JSON.parse(
+    fs.readFileSync("/tmp/.workchat_credentials_cache").toString()
+  );
   client.loggedIn = true;
   client.httpApi.token = cached.httpApi;
   client.session.tokens = cached.session;
@@ -68,7 +70,7 @@ const isLoggedIn = () => {
 const loginAuth = (uid, nonce) => {
   return client.login(uid, `${nonce}:${verifier}`).then(() => {
     fs.writeFileSync(
-      ".credentials_cache",
+      "/tmp/.workchat_credentials_cache",
       JSON.stringify({
         session: client.session.tokens,
         httpApi: client.httpApi.token

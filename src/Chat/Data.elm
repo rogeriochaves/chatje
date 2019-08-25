@@ -40,14 +40,19 @@ sendMessage currentUserId threadId message =
     let
         returnMsg =
             RemoteData.fromResult
-                >> always
-                    (NewMessage
-                        { threadId = threadId
-                        , message = message
-                        , authorId = currentUserId
-                        , timestamp = 0
-                        }
-                    )
+                >> (\res ->
+                        case res of
+                            Success True ->
+                                NewMessage
+                                    { threadId = threadId
+                                    , message = message
+                                    , authorId = currentUserId
+                                    , timestamp = 0
+                                    }
+
+                            _ ->
+                                UpdateDraft message
+                   )
     in
     Http.post
         { url = "/api/messages/" ++ threadId ++ "/send"
@@ -57,5 +62,5 @@ sendMessage currentUserId threadId message =
                     [ ( "message", Encoder.string message )
                     ]
                 )
-        , expect = Http.expectJson returnMsg decodeMessages
+        , expect = Http.expectJson returnMsg (Decoder.field "succeeded" Decoder.bool)
         }

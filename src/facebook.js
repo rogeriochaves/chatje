@@ -31,10 +31,7 @@ try {
     }
     await client.createQueue(seqId);
   });
-  client.mqttApi
-    .connect(client.session.tokens, client.session.deviceId)
-    .then(res => console.log("res connect", res))
-    .catch(err => console.log("err connect", err));
+  client.mqttApi.connect(client.session.tokens, client.session.deviceId);
   console.log("Credentials retrieved from cache");
 } catch (e) {}
 

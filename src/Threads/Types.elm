@@ -5,6 +5,7 @@ import RemoteData exposing (..)
 
 type alias Model =
     { threads : WebData Threads
+    , unreads : List String
     }
 
 
@@ -16,7 +17,6 @@ type alias Thread =
     { id : String
     , name : Maybe String
     , participants : List Participant
-    , unread : Bool
     }
 
 

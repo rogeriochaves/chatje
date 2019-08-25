@@ -4,6 +4,7 @@ import Element exposing (..)
 import Html.Attributes
 import RemoteData exposing (..)
 import Styles
+import Threads.Data exposing (isUnread)
 import Threads.Types exposing (..)
 import User.Types exposing (User)
 
@@ -24,7 +25,7 @@ renderThreadList pendingUser model =
     case ( model.threads, pendingUser ) of
         ( Success threads, Success user ) ->
             column [ width (maximum 260 <| fill) ]
-                (List.map (renderThread user) threads)
+                (List.map (renderThread user model) threads)
 
         ( Failure _, _ ) ->
             el [ padding 8 ] (text "Error on loading threads")
@@ -36,11 +37,11 @@ renderThreadList pendingUser model =
             none
 
 
-renderThread : User -> Thread -> Element Msg
-renderThread user thread =
+renderThread : User -> Model -> Thread -> Element Msg
+renderThread user model thread =
     let
         threadStyle =
-            if thread.unread then
+            if isUnread model thread.id then
                 Styles.unreadThread
 
             else

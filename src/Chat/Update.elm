@@ -84,7 +84,16 @@ updateChat user msg model =
                 updatedMessageList =
                     case Dict.get threadId model.messages of
                         Just (Success messages_) ->
-                            Success (messages_ ++ [ newMessage ])
+                            case ( currentUser user, List.reverse messages_ |> List.head ) of
+                                ( Just user_, Just lastMessage ) ->
+                                    if lastMessage.authorId == user_.id && lastMessage.message == newMessage.message then
+                                        Success messages_
+
+                                    else
+                                        Success (messages_ ++ [ newMessage ])
+
+                                _ ->
+                                    Success (messages_ ++ [ newMessage ])
 
                         Nothing ->
                             Success [ newMessage ]

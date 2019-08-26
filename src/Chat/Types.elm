@@ -33,3 +33,4 @@ type Msg
     | UpdateDraft String
     | SendMessage String
     | NewMessage NewMessagePayload
+    | ScrollChat

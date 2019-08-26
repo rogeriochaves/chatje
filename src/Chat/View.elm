@@ -29,6 +29,7 @@ view user threadId model =
             (Input.text
                 ([ height (px 40)
                  , onEnter (SendMessage threadId)
+                 , htmlAttribute (Html.Attributes.id "draft-field")
                  ]
                     ++ Styles.messageBoxInput
                 )

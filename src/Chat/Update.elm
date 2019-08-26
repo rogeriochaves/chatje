@@ -4,6 +4,7 @@ import Browser.Dom
 import Chat.Data exposing (fetchMessages, sendMessage)
 import Chat.Types exposing (..)
 import Dict
+import Process
 import RemoteData exposing (..)
 import Return exposing (Return, return)
 import Router.Routes exposing (..)
@@ -37,6 +38,7 @@ update user msgFor model =
                         (Cmd.batch
                             [ fetchMessages threadId
                             , scrollChat
+                            , focusDraft
                             ]
                         )
 
@@ -58,7 +60,13 @@ updateChat user msg model =
                 messages_ =
                     model.messages |> Dict.insert threadId messages
             in
-            return { model | messages = messages_ } scrollChat
+            return { model | messages = messages_ }
+                (Cmd.batch
+                    [ scrollChat
+                    , Process.sleep 100 |> Task.perform (always ScrollChat)
+                    , Process.sleep 400 |> Task.perform (always ScrollChat)
+                    ]
+                )
 
         UpdateDraft text ->
             return { model | draft = text } Cmd.none
@@ -106,9 +114,18 @@ updateChat user msg model =
             in
             return { model | messages = updatedMessages } scrollChat
 
+        ScrollChat ->
+            return model scrollChat
+
 
 scrollChat : Cmd Chat.Types.Msg
 scrollChat =
     Browser.Dom.getViewportOf "chat"
         |> Task.andThen (\info -> Browser.Dom.setViewportOf "chat" 0 info.scene.height)
+        |> Task.attempt (\_ -> NoOp)
+
+
+focusDraft : Cmd Chat.Types.Msg
+focusDraft =
+    Browser.Dom.focus "draft-field"
         |> Task.attempt (\_ -> NoOp)

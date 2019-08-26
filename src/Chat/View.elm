@@ -1,6 +1,7 @@
 module Chat.View exposing (renderMessage, renderMessagesList, view)
 
 import Chat.Types exposing (..)
+import DateFormat
 import Dict
 import Element exposing (..)
 import Element.Input as Input
@@ -8,9 +9,25 @@ import Html.Attributes
 import Json.Decode as Decode
 import RemoteData exposing (..)
 import Styles exposing (..)
+import Time exposing (utc)
 import User.Data exposing (currentUser)
 import User.Types as User
 import Utils exposing (onEnter)
+
+
+formatTimestamp : Int -> String
+formatTimestamp =
+    Time.millisToPosix
+        >> DateFormat.format
+            [ DateFormat.monthNameFull
+            , DateFormat.text " "
+            , DateFormat.dayOfMonthSuffix
+            , DateFormat.text " "
+            , DateFormat.hourMilitaryFixed
+            , DateFormat.text ":"
+            , DateFormat.minuteFixed
+            ]
+            utc
 
 
 view : User.Model -> String -> Model -> Element Msg
@@ -100,11 +117,23 @@ renderMessage user message =
                     else
                         [ text message.message ]
     in
-    row [ spacing 12 ]
+    row
+        [ spacing 12
+        , htmlAttribute (Html.Attributes.id "message-item")
+        ]
         [ el ([ width (px 200), alignTop ] ++ authorStyle) (text authorName)
         , paragraph
             [ width (px 200)
-            , htmlAttribute (Html.Attributes.style "width" "calc(100vw - 550px)")
+            , htmlAttribute (Html.Attributes.style "width" "calc(100vw - 700px)")
             ]
             textMessage
+        , el
+            ([ alignRight
+             , alignTop
+             , width (px 150)
+             , htmlAttribute (Html.Attributes.id "message-timestamp")
+             ]
+                ++ Styles.timestamp
+            )
+            (text <| formatTimestamp message.timestamp)
         ]

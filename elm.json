@@ -16,7 +16,8 @@
             "elm/time": "1.0.0",
             "elm/url": "1.0.0",
             "krisajenkins/remotedata": "6.0.1",
-            "mdgriffith/elm-ui": "1.1.0"
+            "mdgriffith/elm-ui": "1.1.0",
+            "ryannhg/date-format": "2.3.0"
         },
         "indirect": {
             "elm/bytes": "1.0.8",

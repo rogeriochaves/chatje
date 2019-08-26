@@ -63,8 +63,14 @@ update currentPage msgFor model =
                                     :: threads
                             )
                             model.threads
+
+                command =
+                    if existingThread then
+                        Cmd.none
+                    else
+                        fetchThreads
             in
-            return { model | threads = updatedThreads, unreads = unreads } fetchThreads
+            return { model | threads = updatedThreads, unreads = unreads } Cmd.none
 
         Types.MsgForRouter (Router.Types.OnUrlChange url) ->
             case parseUrl url of

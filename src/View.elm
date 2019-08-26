@@ -29,7 +29,7 @@ renderRoute model =
         mainView mainScreen =
             row [ width fill, height fill ]
                 [ el [ padding 0, width fill, height fill ] mainScreen
-                , Element.map MsgForThreads (Threads.View.view model.user.currentUser model.threads)
+                , Element.map MsgForThreads (Threads.View.view model.router.page model.user.currentUser model.threads)
                 ]
 
         showLoading inChat view_ =

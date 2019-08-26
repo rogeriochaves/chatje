@@ -58,6 +58,7 @@ fieldInput =
 button : List (Attribute msg)
 button =
     [ Border.color (rgb255 255 255 255)
+    , Border.width 1
     ]
 
 

@@ -2,11 +2,13 @@ module Chat.Types exposing (Message, Model, Msg(..), NewMessagePayload)
 
 import Dict
 import RemoteData exposing (..)
+import Time
 
 
 type alias Model =
     { messages : Dict.Dict String (WebData (List Message))
     , draft : String
+    , zone : Time.Zone
     }
 
 
@@ -35,3 +37,4 @@ type Msg
     | NewMessage NewMessagePayload
     | ScrollChat
     | MessageSent NewMessagePayload
+    | UpdateZone Time.Zone

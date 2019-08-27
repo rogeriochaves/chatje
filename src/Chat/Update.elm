@@ -22,8 +22,9 @@ init =
     return
         { messages = Dict.empty
         , draft = ""
+        , zone = Time.utc
         }
-        Cmd.none
+        (Task.perform UpdateZone Time.here)
 
 
 update : User.Types.Model -> Types.Msg -> Model -> Return Chat.Types.Msg Model
@@ -127,6 +128,8 @@ updateChat user msg model =
                     Time.now
                 )
 
+        UpdateZone zone ->
+            return {model | zone = zone} Cmd.none
 
 scrollChat : Cmd Chat.Types.Msg
 scrollChat =

@@ -9,17 +9,17 @@ import Html.Attributes
 import Json.Decode as Decode
 import RemoteData exposing (..)
 import Styles exposing (..)
-import Time exposing (utc)
+import Time
 import User.Data exposing (currentUser)
 import User.Types as User
 import Utils exposing (onEnter)
 
 
-formatTimestamp : Int -> String
-formatTimestamp =
+formatTimestamp : Time.Zone -> Int -> String
+formatTimestamp zone =
     Time.millisToPosix
         >> DateFormat.format
-            [ DateFormat.monthNameFull
+            [ DateFormat.monthNameAbbreviated
             , DateFormat.text " "
             , DateFormat.dayOfMonthSuffix
             , DateFormat.text " "
@@ -27,7 +27,7 @@ formatTimestamp =
             , DateFormat.text ":"
             , DateFormat.minuteFixed
             ]
-            utc
+            zone
 
 
 view : User.Model -> String -> Model -> Element Msg
@@ -41,7 +41,7 @@ view user threadId model =
             , htmlAttribute (Html.Attributes.style "height" "calc(100vh - 50px)")
             , htmlAttribute (Html.Attributes.id "chat")
             ]
-            [ renderMessagesList user (Dict.get threadId model.messages) ]
+            [ renderMessagesList model user (Dict.get threadId model.messages) ]
         , el ([ width fill ] ++ Styles.messageBox)
             (Input.text
                 ([ height (px 40)
@@ -59,13 +59,13 @@ view user threadId model =
         ]
 
 
-renderMessagesList : User.Model -> Maybe (WebData (List Message)) -> Element Msg
-renderMessagesList user messages =
+renderMessagesList : Model -> User.Model -> Maybe (WebData (List Message)) -> Element Msg
+renderMessagesList model user messages =
     el [ padding 10, width fill, height fill ]
         (case messages of
             Just (Success messages_) ->
-                column [ spacing 12, alignBottom ]
-                    (List.map (renderMessage user) messages_)
+                column [ alignBottom ]
+                    (List.map (renderMessage model user) messages_)
 
             Just (Failure _) ->
                 el [ centerX, centerY ] (text "Error on loading messages")
@@ -75,8 +75,8 @@ renderMessagesList user messages =
         )
 
 
-renderMessage : User.Model -> Message -> Element Msg
-renderMessage user message =
+renderMessage : Model -> User.Model -> Message -> Element Msg
+renderMessage model user message =
     let
         authorName =
             Dict.get message.authorId user.users
@@ -120,16 +120,15 @@ renderMessage user message =
         timestamp =
             el
                 ([ alignRight
-                 , alignTop
-                 , width (px 150)
                  , htmlAttribute (Html.Attributes.id "message-timestamp")
                  ]
                     ++ Styles.timestamp
                 )
-                (text <| formatTimestamp message.timestamp)
+                (text <| formatTimestamp model.zone message.timestamp)
     in
     row
         [ spacing 12
+        , paddingXY 0 6
         , htmlAttribute (Html.Attributes.id "message-item")
         ]
         [ el ([ width (px 200), alignTop ] ++ authorStyle) (text authorName)

@@ -46,33 +46,40 @@ update currentPage msgFor model =
                         model.unreads
 
                 existingThread =
-                    RemoteData.map (List.filter (\{ id } -> id == threadId) >> List.length) model.threads
-                        |> (==) (Success 1)
+                    case model.threads of
+                        Success threads_ ->
+                            List.filter (\{ id } -> id == threadId) threads_
+                                |> List.head
+
+                        _ ->
+                            Nothing
 
                 updatedThreads =
-                    if existingThread then
+                    RemoteData.map
+                        (\threads ->
+                            case existingThread of
+                                Just existingThread_ ->
+                                    existingThread_
+                                        :: List.filter (\{ id } -> id /= threadId) threads
+
+                                Nothing ->
+                                    { id = threadId
+                                    , name = Just threadId
+                                    , participants = []
+                                    , unread = True
+                                    }
+                                        :: threads
+                        )
                         model.threads
 
-                    else
-                        RemoteData.map
-                            (\threads ->
-                                { id = threadId
-                                , name = Just threadId
-                                , participants = []
-                                , unread = True
-                                }
-                                    :: threads
-                            )
-                            model.threads
-
                 command =
-                    if existingThread then
-                        Cmd.none
+                    if existingThread == Nothing then
+                        fetchThreads
 
                     else
-                        fetchThreads
+                        Cmd.none
             in
-            return { model | threads = updatedThreads, unreads = unreads } Cmd.none
+            return { model | threads = updatedThreads, unreads = unreads } command
 
         Types.MsgForRouter (Router.Types.OnUrlChange url) ->
             case parseUrl url of
@@ -103,7 +110,8 @@ updateThreads currentPage msg model =
                         ChatPage threadId ->
                             threadId
 
-                        _ -> ""
+                        _ ->
+                            ""
 
                 newUnreads =
                     case threads of

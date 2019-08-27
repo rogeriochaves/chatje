@@ -32,6 +32,7 @@ decodeThread =
         |> required "id" Decoder.string
         |> required "name" (Decoder.nullable Decoder.string)
         |> required "participants" (Decoder.list decodeParticipant)
+        |> required "unreadCount" (Decoder.int |> Decoder.map (\unreads -> unreads > 0))
 
 
 decodeParticipant : Decoder.Decoder Participant

@@ -1,4 +1,4 @@
-module Chat.Data exposing (decodeMessages, fetchMessages, sendMessage)
+module Chat.Data exposing (decodeMessages, fetchMessages, sendMessage, markAsRead)
 
 import Array exposing (Array, map)
 import Chat.Types exposing (..)
@@ -71,4 +71,13 @@ sendMessage currentUserId threadId message =
                     ]
                 )
         , expect = Http.expectJson returnMsg (Decoder.field "succeeded" Decoder.bool)
+        }
+
+
+markAsRead : String -> Message -> Cmd Msg
+markAsRead threadId lastMessage =
+    Http.post
+        { url = "/api/messages/" ++ threadId ++ "/markAsRead/" ++ lastMessage.authorId
+        , body = Http.emptyBody
+        , expect = Http.expectJson (always NoOp) (Decoder.field "succeeded" Decoder.bool)
         }

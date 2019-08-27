@@ -77,6 +77,19 @@ app.post("/api/messages/:threadId/send", (req, res) => {
   jsonResponse(res, facebook.client.sendMessage(req.params.threadId, message));
 });
 
+app.post("/api/messages/:threadId/markAsRead/:authorId", (req, res) => {
+  const message = {
+    authorId: req.params.authorId,
+    threadId: req.params.threadId,
+    id: "",
+    timestamp: Date.now(),
+    message: "",
+    fileAttachments: null,
+    mediaAttachments: null
+  };
+  jsonResponse(res, facebook.client.sendReadReceipt(message));
+});
+
 const jsonResponse = (res, promise) =>
   promise
     .then(x => {

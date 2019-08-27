@@ -23,7 +23,7 @@ update : Page -> Types.Msg -> Model -> Return Msg Model
 update currentPage msgFor model =
     case msgFor of
         Types.MsgForThreads msg ->
-            updateThreads msg model
+            updateThreads currentPage msg model
 
         Types.MsgForChat (Chat.Types.NewMessage { threadId, timestamp, authorId }) ->
             let
@@ -59,6 +59,7 @@ update currentPage msgFor model =
                                 { id = threadId
                                 , name = Just threadId
                                 , participants = []
+                                , unread = True
                                 }
                                     :: threads
                             )
@@ -67,6 +68,7 @@ update currentPage msgFor model =
                 command =
                     if existingThread then
                         Cmd.none
+
                     else
                         fetchThreads
             in
@@ -88,14 +90,37 @@ update currentPage msgFor model =
             return model Cmd.none
 
 
-updateThreads : Msg -> Model -> Return Msg Model
-updateThreads msg model =
+updateThreads : Page -> Msg -> Model -> Return Msg Model
+updateThreads currentPage msg model =
     case msg of
         NoOp ->
             return model Cmd.none
 
         LoadedThreads threads ->
-            return { model | threads = threads } Cmd.none
+            let
+                currentThread =
+                    case currentPage of
+                        ChatPage threadId ->
+                            threadId
+
+                        _ -> ""
+
+                newUnreads =
+                    case threads of
+                        Success threads_ ->
+                            List.filter .unread threads_
+                                |> List.map .id
+                                |> List.filter ((/=) currentThread)
+
+                        _ ->
+                            []
+            in
+            return
+                { model
+                    | threads = threads
+                    , unreads = model.unreads ++ newUnreads
+                }
+                Cmd.none
 
         RefreshThreads ->
             return model fetchThreads

@@ -1,7 +1,7 @@
 module Chat.Update exposing (init, update, updateChat)
 
 import Browser.Dom
-import Chat.Data exposing (fetchMessages, sendMessage)
+import Chat.Data exposing (fetchMessages, markAsRead, sendMessage)
 import Chat.Types exposing (..)
 import Dict
 import Process
@@ -61,12 +61,24 @@ updateChat user msg model =
             let
                 messages_ =
                     model.messages |> Dict.insert threadId messages
+
+                markLastMessageAsRead =
+                    case messages of
+                        Success messages__ ->
+                            List.reverse messages__
+                                |> List.head
+                                |> Maybe.map (markAsRead threadId)
+                                |> Maybe.withDefault Cmd.none
+
+                        _ ->
+                            Cmd.none
             in
             return { model | messages = messages_ }
                 (Cmd.batch
                     [ scrollChat
                     , Process.sleep 100 |> Task.perform (always ScrollChat)
                     , Process.sleep 400 |> Task.perform (always ScrollChat)
+                    , markLastMessageAsRead
                     ]
                 )
 
@@ -129,7 +141,8 @@ updateChat user msg model =
                 )
 
         UpdateZone zone ->
-            return {model | zone = zone} Cmd.none
+            return { model | zone = zone } Cmd.none
+
 
 scrollChat : Cmd Chat.Types.Msg
 scrollChat =

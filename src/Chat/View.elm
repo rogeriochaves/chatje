@@ -116,6 +116,17 @@ renderMessage user message =
 
                     else
                         [ text message.message ]
+
+        timestamp =
+            el
+                ([ alignRight
+                 , alignTop
+                 , width (px 150)
+                 , htmlAttribute (Html.Attributes.id "message-timestamp")
+                 ]
+                    ++ Styles.timestamp
+                )
+                (text <| formatTimestamp message.timestamp)
     in
     row
         [ spacing 12
@@ -124,16 +135,7 @@ renderMessage user message =
         [ el ([ width (px 200), alignTop ] ++ authorStyle) (text authorName)
         , paragraph
             [ width (px 200)
-            , htmlAttribute (Html.Attributes.style "width" "calc(100vw - 700px)")
+            , htmlAttribute (Html.Attributes.style "width" "calc(100vw - 550px)")
             ]
-            textMessage
-        , el
-            ([ alignRight
-             , alignTop
-             , width (px 150)
-             , htmlAttribute (Html.Attributes.id "message-timestamp")
-             ]
-                ++ Styles.timestamp
-            )
-            (text <| formatTimestamp message.timestamp)
+            (timestamp :: textMessage)
         ]

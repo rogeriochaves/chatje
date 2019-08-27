@@ -10,6 +10,7 @@ import Return exposing (Return, return)
 import Router.Routes exposing (..)
 import Router.Types exposing (Msg(..))
 import Task
+import Time
 import Types
 import Url.Parser exposing (parse)
 import User.Data exposing (currentUser)
@@ -116,6 +117,15 @@ updateChat user msg model =
 
         ScrollChat ->
             return model scrollChat
+
+        MessageSent message ->
+            return model
+                (Task.perform
+                    (\time ->
+                        NewMessage { message | timestamp = Time.posixToMillis time }
+                    )
+                    Time.now
+                )
 
 
 scrollChat : Cmd Chat.Types.Msg

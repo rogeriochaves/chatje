@@ -34,3 +34,4 @@ type Msg
     | SendMessage String
     | NewMessage NewMessagePayload
     | ScrollChat
+    | MessageSent NewMessagePayload

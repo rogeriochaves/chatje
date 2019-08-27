@@ -51,7 +51,7 @@ sendMessage currentUserId threadId message =
                 >> (\res ->
                         case res of
                             Success True ->
-                                NewMessage
+                                MessageSent
                                     { threadId = threadId
                                     , message = message
                                     , authorId = currentUserId

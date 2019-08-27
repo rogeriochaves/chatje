@@ -1,10 +1,10 @@
-module Chat.Data exposing (decodeMessages, fetchMessages, markAsRead, sendMessage)
+module Chat.Data exposing (decodeMessage, decodeMessages, fetchMessages, markAsRead, sendMessage)
 
 import Array exposing (Array, map)
 import Chat.Types exposing (..)
 import Dict exposing (Dict, map, toList)
 import Http
-import Json.Decode as Decoder exposing (Decoder, bool, field, int, list, nullable, string)
+import Json.Decode as Decoder exposing (Decoder, bool, field, int, list, nullable, oneOf, string)
 import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as Encoder
 import RemoteData exposing (..)
@@ -30,10 +30,18 @@ decodeMessages =
 decodeMessage : Decoder.Decoder Message
 decodeMessage =
     Decoder.succeed Message
+        |> required "threadId" string
         |> required "timestamp" int
-        |> required "authorId" string
+        |> required "authorId" stringOrInt
         |> required "message" string
-        |> required "stickerId" (nullable (field "id" string))
+        |> optional "stickerId"
+            (nullable <|
+                oneOf
+                    [ field "id" stringOrInt
+                    , stringOrInt
+                    ]
+            )
+            Nothing
         |> required "fileAttachments"
             (Decoder.oneOf
                 [ Decoder.list
@@ -46,6 +54,10 @@ decodeMessage =
                 , Decoder.succeed Nothing
                 ]
             )
+
+
+stringOrInt =
+    oneOf [ string, int |> Decoder.map String.fromInt ]
 
 
 sendMessage : String -> String -> String -> Cmd Msg
@@ -61,6 +73,8 @@ sendMessage currentUserId threadId message =
                                     , message = message
                                     , authorId = currentUserId
                                     , timestamp = 0
+                                    , stickerId = Nothing
+                                    , image = Nothing
                                     }
 
                             _ ->

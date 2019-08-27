@@ -1,5 +1,6 @@
-port module Subscriptions exposing (decodeEvent, decodeNewMessage, decodeType, fbEvent, subscriptions)
+port module Subscriptions exposing (decodeEvent, decodeType, fbEvent, subscriptions)
 
+import Chat.Data exposing (decodeMessage)
 import Chat.Types
 import Json.Decode exposing (..)
 import Json.Decode.Pipeline exposing (optional, required)
@@ -12,7 +13,8 @@ import Types exposing (..)
 subscriptions : Model -> Sub Msg
 subscriptions model =
     let
-      tenMinutes = 10 * 60 * 1000
+        tenMinutes =
+            10 * 60 * 1000
     in
     Sub.batch
         [ fbEvent decodeEvent
@@ -26,7 +28,7 @@ decodeEvent event =
         processType type_ =
             case type_ of
                 "message" ->
-                    Json.Decode.decodeValue decodeNewMessage event
+                    Json.Decode.decodeValue (field "payload" decodeMessage) event
                         |> Result.map (MsgForChat << Chat.Types.NewMessage)
 
                 _ ->
@@ -40,15 +42,6 @@ decodeEvent event =
 decodeType : Json.Decode.Decoder String
 decodeType =
     Json.Decode.field "type" Json.Decode.string
-
-
-decodeNewMessage : Json.Decode.Decoder Chat.Types.NewMessagePayload
-decodeNewMessage =
-    Json.Decode.succeed Chat.Types.NewMessagePayload
-        |> required "payload" (Json.Decode.field "threadId" Json.Decode.string)
-        |> required "payload" (Json.Decode.field "timestamp" Json.Decode.int)
-        |> required "payload" (Json.Decode.field "authorId" (oneOf [ map String.fromInt int, string ]))
-        |> required "payload" (Json.Decode.field "message" Json.Decode.string)
 
 
 port fbEvent : (Json.Encode.Value -> msg) -> Sub msg

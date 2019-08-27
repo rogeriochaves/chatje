@@ -90,18 +90,10 @@ updateChat user msg model =
                 Nothing ->
                     return model Cmd.none
 
-        NewMessage { threadId, timestamp, authorId, message } ->
+        NewMessage newMessage ->
             let
-                newMessage =
-                    { timestamp = timestamp
-                    , authorId = authorId
-                    , message = message
-                    , stickerId = Nothing
-                    , image = Nothing
-                    }
-
                 updatedMessageList =
-                    case Dict.get threadId model.messages of
+                    case Dict.get newMessage.threadId model.messages of
                         Just (Success messages_) ->
                             case ( currentUser user, List.reverse messages_ |> List.head ) of
                                 ( Just user_, Just lastMessage ) ->
@@ -121,7 +113,7 @@ updateChat user msg model =
                             any
 
                 updatedMessages =
-                    Dict.insert threadId updatedMessageList model.messages
+                    Dict.insert newMessage.threadId updatedMessageList model.messages
             in
             return { model | messages = updatedMessages } scrollChat
 

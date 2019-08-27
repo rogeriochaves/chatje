@@ -1,4 +1,4 @@
-module Chat.Types exposing (Image, Message, Model, Msg(..), NewMessagePayload)
+module Chat.Types exposing (Image, Message, Model, Msg(..))
 
 import Dict
 import RemoteData exposing (..)
@@ -13,7 +13,8 @@ type alias Model =
 
 
 type alias Message =
-    { timestamp : Int
+    { threadId : String
+    , timestamp : Int
     , authorId : String
     , message : String
     , stickerId : Maybe String
@@ -28,20 +29,12 @@ type alias Image =
     }
 
 
-type alias NewMessagePayload =
-    { threadId : String
-    , timestamp : Int
-    , authorId : String
-    , message : String
-    }
-
-
 type Msg
     = NoOp
     | LoadedMessages String (WebData (List Message))
     | UpdateDraft String
     | SendMessage String
-    | NewMessage NewMessagePayload
+    | NewMessage Message
     | ScrollChat
-    | MessageSent NewMessagePayload
+    | MessageSent Message
     | UpdateZone Time.Zone

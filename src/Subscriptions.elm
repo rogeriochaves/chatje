@@ -1,4 +1,4 @@
-port module Subscriptions exposing (decodeEvent, decodeType, fbEvent, subscriptions)
+port module Subscriptions exposing (decodeEvent, decodeType, fbEvent, markAsRead, subscriptions)
 
 import Chat.Data exposing (decodeMessage)
 import Chat.Types
@@ -45,3 +45,6 @@ decodeType =
 
 
 port fbEvent : (Json.Encode.Value -> msg) -> Sub msg
+
+
+port markAsRead : { authorId : String, threadId : String } -> Cmd msg

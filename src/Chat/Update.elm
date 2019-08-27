@@ -1,13 +1,14 @@
 module Chat.Update exposing (init, update, updateChat)
 
 import Browser.Dom
-import Chat.Data exposing (fetchMessages, markAsRead, sendMessage)
+import Chat.Data exposing (fetchMessages, sendMessage)
 import Chat.Types exposing (..)
 import Dict
 import RemoteData exposing (..)
 import Return exposing (Return, return)
 import Router.Routes exposing (..)
 import Router.Types exposing (Msg(..))
+import Subscriptions exposing (markAsRead)
 import Task
 import Time
 import Types
@@ -66,7 +67,7 @@ updateChat user msg model =
                         Success messages__ ->
                             List.reverse messages__
                                 |> List.head
-                                |> Maybe.map (markAsRead threadId)
+                                |> Maybe.map (\m -> markAsRead { threadId = threadId, authorId = m.authorId })
                                 |> Maybe.withDefault Cmd.none
 
                         _ ->

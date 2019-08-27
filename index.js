@@ -81,19 +81,6 @@ app.post("/api/messages/:threadId/send", (req, res) => {
   );
 });
 
-app.post("/api/messages/:threadId/markAsRead/:authorId", (req, res) => {
-  const message = {
-    authorId: req.params.authorId,
-    threadId: req.params.threadId,
-    id: "",
-    timestamp: Date.now(),
-    message: "",
-    fileAttachments: null,
-    mediaAttachments: null
-  };
-  jsonResponse(res, facebook.getClient().sendReadReceipt(message));
-});
-
 const jsonResponse = (res, promise, timeout = 5000) => {
   const timeoutPromise = new Promise((_resolve, reject) =>
     setTimeout(() => reject("Timeout"), timeout)
@@ -136,15 +123,32 @@ const getBundle = res => {
   return { path: `/${bundlePath}`, file };
 };
 
+io.on("connection", socket => {
+  socket.on("markAsRead", ({ threadId, authorId }) => {
+    const message = {
+      authorId: authorId,
+      threadId: threadId,
+      id: "",
+      timestamp: Date.now(),
+      message: "",
+      fileAttachments: null,
+      mediaAttachments: null
+    };
+    facebook.getClient().sendReadReceipt(message);
+  });
+
+  setFacebookListeners();
+});
+
 let listenersSet = false;
-io.on("connection", _socket => {
+const setFacebookListeners = () => {
   if (listenersSet) return;
   facebook.getClient().on("message", message => {
     io.emit("fbEvent", { type: "message", payload: message });
   });
 
   listenersSet = true;
-});
+};
 
 server.listen(PORT, "0.0.0.0", () =>
   console.log(`BasicMessenger listening on port http://localhost:${PORT}`)

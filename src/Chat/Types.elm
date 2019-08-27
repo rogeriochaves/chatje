@@ -1,4 +1,4 @@
-module Chat.Types exposing (Message, Model, Msg(..), NewMessagePayload)
+module Chat.Types exposing (Image, Message, Model, Msg(..), NewMessagePayload)
 
 import Dict
 import RemoteData exposing (..)
@@ -17,7 +17,14 @@ type alias Message =
     , authorId : String
     , message : String
     , stickerId : Maybe String
-    , attachment : Maybe String
+    , image : Maybe Image
+    }
+
+
+type alias Image =
+    { url : String
+    , width : Int
+    , height : Int
     }
 
 

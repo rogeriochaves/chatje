@@ -4,7 +4,6 @@ import Browser.Dom
 import Chat.Data exposing (fetchMessages, markAsRead, sendMessage)
 import Chat.Types exposing (..)
 import Dict
-import Process
 import RemoteData exposing (..)
 import Return exposing (Return, return)
 import Router.Routes exposing (..)
@@ -76,8 +75,6 @@ updateChat user msg model =
             return { model | messages = messages_ }
                 (Cmd.batch
                     [ scrollChat
-                    , Process.sleep 100 |> Task.perform (always ScrollChat)
-                    , Process.sleep 400 |> Task.perform (always ScrollChat)
                     , markLastMessageAsRead
                     ]
                 )
@@ -100,7 +97,7 @@ updateChat user msg model =
                     , authorId = authorId
                     , message = message
                     , stickerId = Nothing
-                    , attachment = Nothing
+                    , image = Nothing
                     }
 
                 updatedMessageList =

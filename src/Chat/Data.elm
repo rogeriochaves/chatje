@@ -1,10 +1,10 @@
-module Chat.Data exposing (decodeMessages, fetchMessages, sendMessage, markAsRead)
+module Chat.Data exposing (decodeMessages, fetchMessages, markAsRead, sendMessage)
 
 import Array exposing (Array, map)
 import Chat.Types exposing (..)
 import Dict exposing (Dict, map, toList)
 import Http
-import Json.Decode as Decoder exposing (Decoder)
+import Json.Decode as Decoder exposing (Decoder, bool, field, int, list, nullable, string)
 import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as Encoder
 import RemoteData exposing (..)
@@ -30,13 +30,18 @@ decodeMessages =
 decodeMessage : Decoder.Decoder Message
 decodeMessage =
     Decoder.succeed Message
-        |> required "timestamp" Decoder.int
-        |> required "authorId" Decoder.string
-        |> required "message" Decoder.string
-        |> required "stickerId" (Decoder.nullable (Decoder.field "id" Decoder.string))
+        |> required "timestamp" int
+        |> required "authorId" string
+        |> required "message" string
+        |> required "stickerId" (nullable (field "id" string))
         |> required "fileAttachments"
             (Decoder.oneOf
-                [ Decoder.list (Decoder.field "url" Decoder.string)
+                [ Decoder.list
+                    (Decoder.succeed Image
+                        |> required "url" string
+                        |> required "metadata" (field "width" int)
+                        |> required "metadata" (field "height" int)
+                    )
                     |> Decoder.map List.head
                 , Decoder.succeed Nothing
                 ]
@@ -70,7 +75,7 @@ sendMessage currentUserId threadId message =
                     [ ( "message", Encoder.string message )
                     ]
                 )
-        , expect = Http.expectJson returnMsg (Decoder.field "succeeded" Decoder.bool)
+        , expect = Http.expectJson returnMsg (field "succeeded" bool)
         }
 
 
@@ -79,5 +84,5 @@ markAsRead threadId lastMessage =
     Http.post
         { url = "/api/messages/" ++ threadId ++ "/markAsRead/" ++ lastMessage.authorId
         , body = Http.emptyBody
-        , expect = Http.expectJson (always NoOp) (Decoder.field "succeeded" Decoder.bool)
+        , expect = Http.expectJson (always NoOp) (field "succeeded" bool)
         }

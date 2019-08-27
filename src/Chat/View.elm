@@ -91,7 +91,7 @@ renderMessage model user message =
                 Styles.authorName
 
         textMessage =
-            case ( message.stickerId, message.attachment ) of
+            case ( message.stickerId, message.image ) of
                 ( Just stickerId, _ ) ->
                     if stickerId == "369239263222822" then
                         [ text <| "👍" ++ message.message ]
@@ -99,12 +99,16 @@ renderMessage model user message =
                     else
                         [ text <| "<sticker " ++ stickerId ++ "> " ++ message.message ]
 
-                ( Nothing, Just attachment ) ->
-                    [ image
-                        [ height (shrink |> maximum 300)
-                        , width (shrink |> maximum 500)
+                ( Nothing, Just image ) ->
+                    let
+                        ( imgWidth, imgHeight ) =
+                            limitSize ( image.width, image.height )
+                    in
+                    [ Element.image
+                        [ width (px imgWidth)
+                        , height (px imgHeight)
                         ]
-                        { src = attachment
+                        { src = image.url
                         , description = message.message
                         }
                     , text message.message
@@ -138,3 +142,15 @@ renderMessage model user message =
             ]
             (timestamp :: textMessage)
         ]
+
+
+limitSize : ( Int, Int ) -> ( Int, Int )
+limitSize ( width, height ) =
+    if height > 300 then
+        limitSize ( toFloat width * (300 / toFloat height) |> ceiling, 300 )
+
+    else if width > 500 then
+        limitSize ( 500, toFloat height * (500 / toFloat width) |> ceiling )
+
+    else
+        ( width, height )

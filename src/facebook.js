@@ -5,8 +5,9 @@ const fs = require("fs");
 let verifier = null;
 let client = new Client();
 
-const recoverCache = () => {
+const reconnectFromCache = () => {
   try {
+    client = new Client();
     const cached = JSON.parse(
       fs.readFileSync("/tmp/.workchat_credentials_cache").toString()
     );
@@ -38,9 +39,13 @@ const recoverCache = () => {
     });
     client.mqttApi.connect(client.session.tokens, client.session.deviceId);
     console.log("Credentials retrieved from cache");
-  } catch (e) {}
+  } catch (e) {
+    console.log("Error retriving from cache:", e);
+  }
 };
-recoverCache();
+reconnectFromCache();
+
+const getClient = () => client;
 
 const base64URLEncode = str => {
   return str
@@ -85,4 +90,10 @@ const loginAuth = (uid, nonce) => {
   });
 };
 
-module.exports = { loginStart, loginAuth, isLoggedIn, client };
+module.exports = {
+  loginStart,
+  loginAuth,
+  isLoggedIn,
+  getClient,
+  reconnectFromCache
+};

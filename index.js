@@ -60,21 +60,25 @@ app.get("/api/user", (_req, res) => {
   }
   jsonResponse(
     res,
-    facebook.client.getUserInfo(facebook.client.session.tokens.uid)
+    facebook.getClient().getUserInfo(facebook.getClient().session.tokens.uid)
   );
 });
 
 app.get("/api/threads", (req, res) => {
-  jsonResponse(res, facebook.client.getThreadList(100));
+  jsonResponse(res, facebook.getClient().getThreadList(100));
 });
 
 app.get("/api/messages/:threadId", (req, res) => {
-  jsonResponse(res, facebook.client.getMessages(req.params.threadId, 30));
+  jsonResponse(res, facebook.getClient().getMessages(req.params.threadId, 30));
 });
 
 app.post("/api/messages/:threadId/send", (req, res) => {
   const message = req.body.message;
-  jsonResponse(res, facebook.client.sendMessage(req.params.threadId, message));
+  jsonResponse(
+    res,
+    facebook.getClient().sendMessage(req.params.threadId, message),
+    2000
+  );
 });
 
 app.post("/api/messages/:threadId/markAsRead/:authorId", (req, res) => {
@@ -87,18 +91,25 @@ app.post("/api/messages/:threadId/markAsRead/:authorId", (req, res) => {
     fileAttachments: null,
     mediaAttachments: null
   };
-  jsonResponse(res, facebook.client.sendReadReceipt(message));
+  jsonResponse(res, facebook.getClient().sendReadReceipt(message));
 });
 
-const jsonResponse = (res, promise) =>
-  promise
+const jsonResponse = (res, promise, timeout = 5000) => {
+  const timeoutPromise = new Promise((_resolve, reject) =>
+    setTimeout(() => reject("Timeout"), timeout)
+  );
+  return Promise.race([promise, timeoutPromise])
     .then(x => {
       res.setHeader("Content-Type", "application/json");
       res.end(JSON.stringify(x));
     })
     .catch(err => {
+      if (err === "Timeout") {
+        facebook.reconnectFromCache();
+      }
       res.status(500).send(err.message);
     });
+};
 
 app.get("*", (req, res) => {
   if (req.path !== "/login" && !facebook.isLoggedIn()) {
@@ -128,7 +139,7 @@ const getBundle = res => {
 let listenersSet = false;
 io.on("connection", _socket => {
   if (listenersSet) return;
-  facebook.client.on("message", message => {
+  facebook.getClient().on("message", message => {
     io.emit("fbEvent", { type: "message", payload: message });
   });
 

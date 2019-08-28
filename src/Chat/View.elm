@@ -90,6 +90,9 @@ renderMessage model user message =
             else
                 Styles.authorName
 
+        linkedMessage =
+            addLinks message.message
+
         textMessage =
             case ( message.stickerId, message.image ) of
                 ( Just stickerId, _ ) ->
@@ -97,7 +100,7 @@ renderMessage model user message =
                         [ text <| "👍" ++ message.message ]
 
                     else
-                        [ text <| "<sticker " ++ stickerId ++ "> " ++ message.message ]
+                        [ text <| "<sticker " ++ stickerId ++ "> " ] ++ linkedMessage
 
                 ( Nothing, Just image ) ->
                     let
@@ -111,15 +114,15 @@ renderMessage model user message =
                         { src = image.url
                         , description = message.message
                         }
-                    , text message.message
                     ]
+                        ++ linkedMessage
 
                 ( Nothing, Nothing ) ->
                     if message.message == "" then
                         [ text "<not implemented yet>" ]
 
                     else
-                        [ text message.message ]
+                        linkedMessage
 
         timestamp =
             el
@@ -154,3 +157,50 @@ limitSize ( width, height ) =
 
     else
         ( width, height )
+
+
+type TextOrLink
+    = PlainText String
+    | Linked String
+
+
+addLinks message =
+    String.split "\n" message
+        |> List.concatMap
+            (\line ->
+                String.split " " line
+                    |> List.map
+                        (\str ->
+                            if String.startsWith "http" str then
+                                Linked str
+
+                            else
+                                PlainText str
+                        )
+                    |> List.foldl
+                        (\item acc ->
+                            case ( List.head acc, item ) of
+                                ( Nothing, _ ) ->
+                                    [ item ]
+
+                                ( Just (PlainText str), PlainText str_ ) ->
+                                    PlainText (str ++ " " ++ str_) :: (List.tail acc |> Maybe.withDefault [])
+
+                                ( Just (PlainText str), Linked str_ ) ->
+                                    Linked str_ :: acc
+
+                                _ ->
+                                    item :: acc
+                        )
+                        []
+                    |> List.reverse
+                    |> List.map
+                        (\item ->
+                            case item of
+                                PlainText str ->
+                                    text (str ++ " ")
+
+                                Linked str ->
+                                    Element.newTabLink [] { label = text (str ++ " "), url = str }
+                        )
+            )

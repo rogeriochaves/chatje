@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "NODE_ENV=development electron .",
-    "start:dev": "NODE_ENV=development node-dev .",
+    "start": "NODE_ENV=development node-dev .",
+    "start:electron": "NODE_ENV=development electron .",
     "start:prod": "NODE_ENV=production electron .",
     "build": "mkdir -p build && webpack --mode=production --progress --json > build/stats.json",
     "package": "npm run build && electron-packager . --platform=darwin --arch=x64 --out out/ --overwrite",

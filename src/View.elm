@@ -18,7 +18,7 @@ import User.View
 
 view : Model -> Browser.Document Types.Msg
 view model =
-    { title = "BasicMessenger"
+    { title = "Chatje"
     , body = [ Element.layout ([ width fill ] ++ Styles.body) <| renderRoute model ]
     }
 

@@ -1,4 +1,4 @@
-# BasicMessenger
+# Chatje
 
 A much faster version of workchat, with much less features, just what you need
 
@@ -6,7 +6,7 @@ A much faster version of workchat, with much less features, just what you need
 
 ## How to install
 
-Go to the [releases](https://github.com/rogeriochaves/basic-workchat/releases) page and download the latest version, unzip it and drag the app to your applications folder.
+Go to the [releases](https://github.com/rogeriochaves/chatje/releases) page and download the latest version, unzip it and drag the app to your applications folder.
 
 That's it, happy chatting!
 

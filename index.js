@@ -151,7 +151,7 @@ const setFacebookListeners = () => {
 };
 
 server.listen(PORT, "0.0.0.0", () =>
-  console.log(`BasicMessenger listening on port http://localhost:${PORT}`)
+  console.log(`Chatje listening on port http://localhost:${PORT}`)
 );
 
 const electron = require("electron");

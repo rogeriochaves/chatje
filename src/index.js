@@ -11,3 +11,14 @@ socket.on("fbEvent", data => {
 app.ports.markAsRead.subscribe(payload => {
   socket.emit("markAsRead", payload);
 });
+
+if (eval('typeof require === "function"')) {
+  const shell = eval('require("electron").shell');
+  document.body.addEventListener("click", function(e) {
+    var href = e.target && (e.target.href || e.target.parentElement.href);
+    if (href && href.match(/^http/)) {
+      event.preventDefault();
+      shell.openExternal(href);
+    }
+  });
+}

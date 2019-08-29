@@ -166,8 +166,8 @@ const electron = require("electron");
 let window;
 const createWindow = () => {
   window = new electron.BrowserWindow({
-    width: 1000,
-    height: 600,
+    width: 1200,
+    height: 800,
     webPreferences: {
       nodeIntegration: true,
       preload: `${__dirname}/src/fixSSOUrl.js`

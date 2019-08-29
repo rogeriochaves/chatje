@@ -5,6 +5,7 @@ import RemoteData exposing (..)
 import Return exposing (Return, return)
 import Router.Routes exposing (..)
 import Router.Types
+import Set
 import Threads.Data exposing (fetchThreads, isUnread)
 import Threads.Types exposing (..)
 import Types
@@ -14,7 +15,7 @@ init : Return Msg Model
 init =
     return
         { threads = Loading
-        , unreads = []
+        , unreads = Set.empty
         }
         Threads.Data.fetchThreads
 
@@ -40,7 +41,7 @@ update currentPage msgFor model =
 
                 unreads =
                     if isIncommingMessage && not isCurrentThread then
-                        threadId :: model.unreads
+                        Set.insert threadId model.unreads
 
                     else
                         model.unreads
@@ -86,7 +87,7 @@ update currentPage msgFor model =
                 ChatPage threadId ->
                     let
                         unreads =
-                            List.filter ((/=) threadId) model.unreads
+                            Set.remove threadId model.unreads
                     in
                     return { model | unreads = unreads } Cmd.none
 
@@ -119,14 +120,15 @@ updateThreads currentPage msg model =
                             List.filter .unread threads_
                                 |> List.map .id
                                 |> List.filter ((/=) currentThread)
+                                |> Set.fromList
 
                         _ ->
-                            []
+                            Set.empty
             in
             return
                 { model
                     | threads = threads
-                    , unreads = model.unreads ++ newUnreads
+                    , unreads = Set.union model.unreads newUnreads
                 }
                 Cmd.none
 

@@ -6,6 +6,7 @@ import Http
 import Json.Decode as Decoder exposing (Decoder)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 import RemoteData exposing (..)
+import Set
 import Threads.Types exposing (..)
 
 
@@ -41,8 +42,7 @@ decodeParticipant =
         |> required "id" Decoder.string
         |> required "name" Decoder.string
 
+
 isUnread : Model -> String -> Bool
 isUnread model threadId =
-    List.filter ((==) threadId) model.unreads
-        |> List.length
-        |> (==) 1
+    Set.member threadId model.unreads

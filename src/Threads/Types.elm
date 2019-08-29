@@ -1,11 +1,11 @@
 module Threads.Types exposing (Model, Msg(..), Participant, Thread, Threads)
 
 import RemoteData exposing (..)
-
+import Set
 
 type alias Model =
     { threads : WebData Threads
-    , unreads : List String
+    , unreads : Set.Set String
     }
 
 

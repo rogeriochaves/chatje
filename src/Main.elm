@@ -6,11 +6,11 @@ import Html.Events exposing (onClick)
 import Router.Types
 import Subscriptions exposing (subscriptions)
 import Types exposing (..)
-import Update exposing (init, update)
+import Update exposing (Flags, init, update)
 import View exposing (view)
 
 
-main : Program () Model Msg
+main : Program Flags Model Msg
 main =
     Browser.application
         { init = init

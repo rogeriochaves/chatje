@@ -1,4 +1,4 @@
-module Styles exposing (authorName, body, button, currentThread, fieldInput, messageBox, messageBoxInput, readThread, selfName, timestamp, unreadThread)
+module Styles exposing (authorName, body, button, currentThread, fieldInput, messageBox, messageBoxInput, popUp, readThread, selfName, timestamp, unreadThread)
 
 import Element exposing (..)
 import Element.Background as Background
@@ -84,4 +84,18 @@ currentThread =
 timestamp : List (Attribute msg)
 timestamp =
     [ Font.color (rgb255 150 150 150)
+    ]
+
+
+popUp : List (Attribute msg)
+popUp =
+    [ Background.color (rgb255 32 32 32)
+    , Border.shadow { offset = ( -5, 0 ), size = 2, blur = 5, color = rgb255 32 32 32 }
+    , Border.color (rgb255 255 255 255)
+    , Border.widthEach
+        { bottom = 1
+        , left = 0
+        , right = 0
+        , top = 0
+        }
     ]

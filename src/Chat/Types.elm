@@ -9,6 +9,7 @@ type alias Model =
     { messages : Dict.Dict String (WebData (List Message))
     , draft : String
     , zone : Time.Zone
+    , openInBrowserPopUp : Bool
     }
 
 
@@ -38,3 +39,4 @@ type Msg
     | ScrollChat
     | MessageSent Message
     | UpdateZone Time.Zone
+    | CloseOpenInBrowserPopup

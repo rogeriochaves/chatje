@@ -1,4 +1,4 @@
-module Update exposing (andMapCmd, init, update)
+module Update exposing (Flags, andMapCmd, init, update)
 
 import Browser
 import Browser.Navigation exposing (Key)
@@ -12,13 +12,18 @@ import Url exposing (Url)
 import User.Update
 
 
-init : flags -> (Url -> (Key -> Return Msg Model))
-init _ url key =
+type alias Flags =
+    { inElectron : Bool
+    }
+
+
+init : Flags -> (Url -> (Key -> Return Msg Model))
+init { inElectron } url key =
     singleton Model
         |> andMapCmd MsgForRouter (Router.Update.init url key)
         |> andMapCmd MsgForThreads Threads.Update.init
         |> andMapCmd MsgForUser User.Update.init
-        |> andMapCmd MsgForChat Chat.Update.init
+        |> andMapCmd MsgForChat (Chat.Update.init inElectron)
         |> andThen (update (MsgForRouter (Router.Types.OnUrlChange url)))
 
 

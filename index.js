@@ -6,6 +6,7 @@ const PORT = args.port || process.env.PORT || 2428;
 const facebook = require("./src/facebook");
 const socketio = require("socket.io");
 const http = require("http");
+const { shell } = require("electron");
 
 const app = express();
 app.set("view engine", "ejs");
@@ -79,6 +80,12 @@ app.post("/api/messages/:threadId/send", (req, res) => {
     facebook.getClient().sendMessage(req.params.threadId, message),
     2000
   );
+});
+
+app.get("/open-in-browser", (_req, res) => {
+  shell.openExternal(`http://localhost:${PORT}`);
+  window.hide();
+  res.send();
 });
 
 const jsonResponse = (res, promise, timeout = 5000) => {
@@ -156,8 +163,9 @@ server.listen(PORT, "0.0.0.0", () =>
 
 const electron = require("electron");
 
+let window;
 const createWindow = () => {
-  const win = new electron.BrowserWindow({
+  window = new electron.BrowserWindow({
     width: 1000,
     height: 600,
     webPreferences: {
@@ -166,7 +174,7 @@ const createWindow = () => {
     }
   });
 
-  win.loadURL(`http://localhost:${PORT}`);
+  window.loadURL(`http://localhost:${PORT}`);
 };
 
 if (electron.app) electron.app.on("ready", createWindow);

@@ -32,7 +32,18 @@ formatTimestamp zone =
 
 view : User.Model -> String -> Model -> Element Msg
 view user threadId model =
-    column [ width fill ]
+    let
+        openInBrowser =
+            if model.openInBrowserPopUp then
+                row ([ width fill, padding 20 ] ++ Styles.popUp)
+                    [ Element.link [] { label = text "Click here to open in browser", url = "/open-in-browser" }
+                    , Input.button [ alignRight ] { label = text "x", onPress = Just CloseOpenInBrowserPopup }
+                    ]
+
+            else
+                Element.none
+    in
+    column [ width fill, inFront openInBrowser ]
         [ column
             [ width fill
             , clipY

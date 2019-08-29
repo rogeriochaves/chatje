@@ -17,12 +17,13 @@ import User.Data exposing (currentUser)
 import User.Types
 
 
-init : Return Chat.Types.Msg Model
-init =
+init : Bool -> Return Chat.Types.Msg Model
+init inElectron =
     return
         { messages = Dict.empty
         , draft = ""
         , zone = Time.utc
+        , openInBrowserPopUp = inElectron
         }
         (Task.perform UpdateZone Time.here)
 
@@ -132,6 +133,9 @@ updateChat user msg model =
 
         UpdateZone zone ->
             return { model | zone = zone } Cmd.none
+
+        CloseOpenInBrowserPopup ->
+            return { model | openInBrowserPopUp = False } Cmd.none
 
 
 scrollChat : Cmd Chat.Types.Msg

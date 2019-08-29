@@ -1,6 +1,7 @@
 module Chat.Update exposing (init, update, updateChat)
 
 import Browser.Dom
+import Browser.Navigation
 import Chat.Data exposing (fetchMessages, sendMessage)
 import Chat.Types exposing (..)
 import Dict
@@ -136,6 +137,9 @@ updateChat user msg model =
 
         CloseOpenInBrowserPopup ->
             return { model | openInBrowserPopUp = False } Cmd.none
+
+        OpenInBrowser ->
+            return model (Browser.Navigation.load "/open-in-browser")
 
 
 scrollChat : Cmd Chat.Types.Msg

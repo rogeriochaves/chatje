@@ -40,3 +40,4 @@ type Msg
     | MessageSent Message
     | UpdateZone Time.Zone
     | CloseOpenInBrowserPopup
+    | OpenInBrowser

@@ -36,7 +36,7 @@ view user threadId model =
         openInBrowser =
             if model.openInBrowserPopUp then
                 row ([ width fill, padding 20 ] ++ Styles.popUp)
-                    [ Element.link [] { label = text "Click here to open in browser", url = "/open-in-browser" }
+                    [ Input.button [] { label = text "Click here to open in browser", onPress = Just OpenInBrowser }
                     , Input.button [ alignRight ] { label = text "x", onPress = Just CloseOpenInBrowserPopup }
                     ]
 

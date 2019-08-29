@@ -16,10 +16,15 @@ app.ports.markAsRead.subscribe(payload => {
 if (inElectron) {
   const shell = eval('require("electron").shell');
   document.body.addEventListener("click", function(e) {
-    var href = e.target && (e.target.href || e.target.parentElement.href);
-    if (href && href.match(/^http/)) {
+    let elem;
+    if (e.target && e.target.target === "_blank") {
+      elem = e.target;
+    } else if (e.target && e.target.parentElement.target === "_blank") {
+      elem = e.target.parentElement;
+    }
+    if (elem) {
       event.preventDefault();
-      shell.openExternal(href);
+      shell.openExternal(elem.href);
     }
   });
 }

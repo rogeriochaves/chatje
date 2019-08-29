@@ -13,12 +13,12 @@ import Types exposing (..)
 subscriptions : Model -> Sub Msg
 subscriptions model =
     let
-        tenMinutes =
-            10 * 60 * 1000
+        fiveMinutes =
+            5 * 60 * 1000
     in
     Sub.batch
         [ fbEvent decodeEvent
-        , Time.every tenMinutes (\_ -> MsgForThreads Threads.Types.RefreshThreads)
+        , Time.every fiveMinutes (\_ -> MsgForThreads Threads.Types.RefreshThreads)
         ]
 
 

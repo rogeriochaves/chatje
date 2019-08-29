@@ -4,15 +4,16 @@ const fs = require("fs");
 
 let verifier = null;
 let client = new Client();
+let reconnectInterval = null;
 
 const reconnectFromCache = () => {
   try {
-    client = new Client();
     const cached = JSON.parse(
       fs.readFileSync("/tmp/.workchat_credentials_cache").toString()
     );
-    const credentialsExpiration = 1000 * 60 * 60 * 72; // 3 days
+    const credentialsExpiration = 1000 * 60 * 60 * 24 * 5; // 5 days
     if (Date.now() - cached.timestamp > credentialsExpiration) return;
+    client = new Client();
     client.loggedIn = true;
     client.httpApi.token = cached.httpApi;
     client.session.tokens = cached.session;
@@ -38,6 +39,9 @@ const reconnectFromCache = () => {
       await client.createQueue(seqId);
     });
     client.mqttApi.connect(client.session.tokens, client.session.deviceId);
+    if (!reconnectInterval) {
+      reconnectInterval = setInterval(reconnectFromCache, 1000 * 60 * 30); // 30 minutes
+    }
     console.log("Credentials retrieved from cache");
   } catch (e) {
     console.log("Error retriving from cache:", e);
@@ -87,6 +91,9 @@ const loginAuth = (uid, nonce) => {
         timestamp: Date.now()
       })
     );
+    if (!reconnectInterval) {
+      reconnectInterval = setInterval(reconnectFromCache, 1000 * 60 * 30); // 30 minutes
+    }
   });
 };
 

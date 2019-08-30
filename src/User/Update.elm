@@ -16,6 +16,7 @@ init =
         { currentUser = Loading
         , users = Dict.empty
         , email = ""
+        , pasteLink = ""
         }
         fetchUser
 
@@ -57,3 +58,9 @@ updateUser msg model =
 
         Login ->
             return model (load <| "/do-login?email=" ++ model.email)
+
+        UpdatePasteLink pasteLink ->
+            return { model | pasteLink = pasteLink } Cmd.none
+
+        PasteLinkSubmit ->
+            return model (load <| String.replace "fb-workchat-sso:/" "http://localhost:2428" model.pasteLink)

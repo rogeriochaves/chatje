@@ -88,6 +88,11 @@ app.get("/open-in-browser", (_req, res) => {
   res.send();
 });
 
+app.get("/sign-in-on-browser", (req, res) => {
+  shell.openExternal(req.query.url);
+  res.redirect("/paste-link");
+});
+
 const jsonResponse = (res, promise, timeout = 5000) => {
   const timeoutPromise = new Promise((_resolve, reject) =>
     setTimeout(() => reject("Timeout"), timeout)
@@ -106,7 +111,11 @@ const jsonResponse = (res, promise, timeout = 5000) => {
 };
 
 app.get("*", (req, res) => {
-  if (req.path !== "/login" && !facebook.isLoggedIn()) {
+  if (
+    req.path !== "/login" &&
+    req.path !== "/paste-link" &&
+    !facebook.isLoggedIn()
+  ) {
     return res.redirect("/login");
   }
   const bundle = getBundle(res);

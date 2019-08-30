@@ -8,6 +8,7 @@ type alias Model =
     { currentUser : WebData User
     , users : Users
     , email : String
+    , pasteLink : String
     }
 
 
@@ -26,3 +27,5 @@ type Msg
     | LoadedUser (WebData User)
     | UpdateEmail String
     | Login
+    | UpdatePasteLink String
+    | PasteLinkSubmit

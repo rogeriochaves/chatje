@@ -57,6 +57,9 @@ renderRoute model =
         Login ->
             Element.map MsgForUser (User.View.login model.user)
 
+        PasteLink ->
+            Element.map MsgForUser (User.View.pasteLink model.user)
+
         NotFound ->
             text "404 Not Found"
 

@@ -10,6 +10,7 @@ type Page
     | NotFound
     | ChatPage String
     | Login
+    | PasteLink
 
 
 routes : Parser (Page -> a) a
@@ -19,6 +20,7 @@ routes =
         , map NotFound (s "404")
         , map ChatPage (s "chat" </> string)
         , map Login (s "login")
+        , map PasteLink (s "paste-link")
         ]
 
 
@@ -36,6 +38,9 @@ toPath page =
 
         Login ->
             "/login"
+
+        PasteLink ->
+            "/paste-link"
 
 
 parseUrl : Url -> Page

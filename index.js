@@ -3,7 +3,6 @@ const args = require("yargs").argv;
 const express = require("express");
 const fs = require("fs");
 const PORT = args.port || process.env.PORT || 2428;
-const facebook = require("./src/facebook");
 const socketio = require("socket.io");
 const http = require("http");
 const { shell } = require("electron");
@@ -16,6 +15,7 @@ app.use(express.json());
 
 const server = http.createServer(app);
 const io = socketio(server);
+const facebook = require("./src/facebook")(io);
 
 let webpack;
 let webpackMiddleware;
@@ -143,19 +143,7 @@ io.on("connection", socket => {
     };
     facebook.getClient().sendReadReceipt(message);
   });
-
-  setFacebookListeners();
 });
-
-let listenersSet = false;
-const setFacebookListeners = () => {
-  if (listenersSet) return;
-  facebook.getClient().on("message", message => {
-    io.emit("fbEvent", { type: "message", payload: message });
-  });
-
-  listenersSet = true;
-};
 
 server.listen(PORT, "0.0.0.0", () =>
   console.log(`Chatje listening on port http://localhost:${PORT}`)

@@ -93,6 +93,10 @@ app.get("/sign-in-on-browser", (req, res) => {
   res.redirect("/paste-link");
 });
 
+app.get("/blank", (_req, res) => {
+  res.send();
+});
+
 const jsonResponse = (res, promise, timeout = 5000) => {
   const timeoutPromise = new Promise((_resolve, reject) =>
     setTimeout(() => reject("Timeout"), timeout)
@@ -172,6 +176,18 @@ const createWindow = () => {
   });
 
   window.loadURL(`http://localhost:${PORT}`);
+
+  electron.app.setAsDefaultProtocolClient("fb-workchat-sso");
+  electron.app.on("open-url", (_event, url) => {
+    if (url.match("fb-workchat-sso")) {
+      window.loadURL(`http://localhost:${PORT}/blank`);
+      setTimeout(() => {
+        window.loadURL(
+          url.replace("fb-workchat-sso:/", `http://localhost:${PORT}`)
+        );
+      }, 1000);
+    }
+  });
 };
 
 if (electron.app) electron.app.on("ready", createWindow);

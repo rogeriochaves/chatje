@@ -4,10 +4,14 @@ const fs = require("fs");
 
 module.exports = io => {
   let verifier = null;
+  let previousClient;
   let client = new Client();
   let reconnectInterval = null;
 
   const setFacebookListeners = () => {
+    if (previousClient) {
+      previousClient.removeAllListeners("message");
+    }
     client.on("message", message => {
       io.emit("fbEvent", { type: "message", payload: message });
     });
@@ -21,6 +25,7 @@ module.exports = io => {
       );
       const credentialsExpiration = 1000 * 60 * 60 * 24 * 5; // 5 days
       if (Date.now() - cached.timestamp > credentialsExpiration) return;
+      previousClient = client;
       client = new Client();
       client.loggedIn = true;
       client.httpApi.token = cached.httpApi;

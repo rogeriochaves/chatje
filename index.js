@@ -65,7 +65,7 @@ app.get("/api/user", (_req, res) => {
   );
 });
 
-app.get("/api/threads", (req, res) => {
+app.get("/api/threads", (_req, res) => {
   jsonResponse(res, facebook.getClient().getThreadList(100));
 });
 
@@ -78,7 +78,7 @@ app.post("/api/messages/:threadId/send", (req, res) => {
   jsonResponse(
     res,
     facebook.getClient().sendMessage(req.params.threadId, message),
-    2000
+    3000
   );
 });
 
@@ -97,19 +97,13 @@ app.get("/blank", (_req, res) => {
   res.send();
 });
 
-const jsonResponse = (res, promise, timeout = 5000) => {
-  const timeoutPromise = new Promise((_resolve, reject) =>
-    setTimeout(() => reject("Timeout"), timeout)
-  );
-  return Promise.race([promise, timeoutPromise])
+const jsonResponse = (res, promise, timeout) => {
+  reconnectOnTimeout(promise, timeout)
     .then(x => {
       res.setHeader("Content-Type", "application/json");
       res.end(JSON.stringify(x));
     })
     .catch(err => {
-      if (err === "Timeout") {
-        facebook.reconnectFromCache();
-      }
       res.status(500).send(err.message);
     });
 };
@@ -143,6 +137,18 @@ const getBundle = res => {
   return { path: `/${bundlePath}`, file };
 };
 
+const reconnectOnTimeout = (promise, timeout = 5000) => {
+  const timeoutPromise = new Promise((_resolve, reject) =>
+    setTimeout(() => reject("Timeout"), timeout)
+  );
+  return Promise.race([promise, timeoutPromise])
+    .catch(err => {
+      if (err === "Timeout") {
+        facebook.reconnectFromCache();
+      }
+    });
+};
+
 io.on("connection", socket => {
   socket.on("markAsRead", ({ threadId, authorId }) => {
     const message = {
@@ -154,7 +160,8 @@ io.on("connection", socket => {
       fileAttachments: null,
       mediaAttachments: null
     };
-    facebook.getClient().sendReadReceipt(message);
+
+    reconnectOnTimeout(facebook.getClient().sendReadReceipt(message));
   });
 });
 

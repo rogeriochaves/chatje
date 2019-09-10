@@ -4,19 +4,16 @@ const fs = require("fs");
 
 module.exports = io => {
   let verifier = null;
-  let previousClient;
   let client = new Client();
-  let reconnectInterval = null;
+  let lastMessage = null;
 
   const setFacebookListeners = () => {
-    if (previousClient) {
-      previousClient.removeAllListeners("message");
-    }
     client.on("message", message => {
+      if (JSON.stringify(message) === JSON.stringify(lastMessage)) return;
       io.emit("fbEvent", { type: "message", payload: message });
+      lastMessage = message;
     });
   };
-  setFacebookListeners();
 
   const reconnectFromCache = () => {
     try {
@@ -25,7 +22,6 @@ module.exports = io => {
       );
       const credentialsExpiration = 1000 * 60 * 60 * 24 * 5; // 5 days
       if (Date.now() - cached.timestamp > credentialsExpiration) return;
-      previousClient = client;
       client = new Client();
       client.loggedIn = true;
       client.httpApi.token = cached.httpApi;
@@ -52,9 +48,6 @@ module.exports = io => {
         await client.createQueue(seqId);
       });
       client.mqttApi.connect(client.session.tokens, client.session.deviceId);
-      if (!reconnectInterval) {
-        reconnectInterval = setInterval(reconnectFromCache, 1000 * 60 * 30); // 30 minutes
-      }
       setFacebookListeners();
       console.log("Credentials retrieved from cache");
     } catch (e) {
@@ -105,9 +98,7 @@ module.exports = io => {
           timestamp: Date.now()
         })
       );
-      if (!reconnectInterval) {
-        reconnectInterval = setInterval(reconnectFromCache, 1000 * 60 * 30); // 30 minutes
-      }
+      setFacebookListeners();
     });
   };
 

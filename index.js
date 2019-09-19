@@ -66,7 +66,11 @@ app.get("/api/user", (_req, res) => {
 });
 
 app.get("/api/threads", (_req, res) => {
-  jsonResponse(res, facebook.getClient().getThreadList(100));
+  jsonResponse(
+    res,
+    facebook.getClient().getThreadList(100),
+    20000
+  );
 });
 
 app.get("/api/messages/:threadId", (req, res) => {

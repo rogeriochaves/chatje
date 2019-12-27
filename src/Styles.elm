@@ -1,4 +1,4 @@
-module Styles exposing (authorName, body, button, currentThread, fieldInput, messageBox, messageBoxInput, popUp, readThread, selfName, timestamp, unreadThread)
+module Styles exposing (authorName, body, button, currentThread, fieldInput, messageBox, messageBoxInput, popUp, readThread, searchBox, selfName, timestamp, unreadThread)
 
 import Element exposing (..)
 import Element.Background as Background
@@ -98,4 +98,11 @@ popUp =
         , right = 0
         , top = 0
         }
+    ]
+
+
+searchBox : List (Attribute msg)
+searchBox =
+    [ Border.color (rgb255 255 255 255)
+    , Border.widthEach { top = 0, right = 0, bottom = 5, left = 0 }
     ]

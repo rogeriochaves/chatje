@@ -7,7 +7,11 @@ import User.Types
 
 
 type alias Model =
-    { router : Router.Types.Model, threads : Threads.Types.Model, user : User.Types.Model, chat : Chat.Types.Model }
+    { router : Router.Types.Model
+    , threads : Threads.Types.Model
+    , user : User.Types.Model
+    , chat : Chat.Types.Model
+    }
 
 
 type Msg

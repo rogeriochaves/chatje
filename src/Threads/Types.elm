@@ -3,9 +3,11 @@ module Threads.Types exposing (Model, Msg(..), Participant, Thread, Threads)
 import RemoteData exposing (..)
 import Set
 
+
 type alias Model =
     { threads : WebData Threads
     , unreads : Set.Set String
+    , search : String
     }
 
 
@@ -31,3 +33,5 @@ type Msg
     = NoOp
     | LoadedThreads (WebData Threads)
     | RefreshThreads
+    | UpdateSearch String
+    | SearchThread

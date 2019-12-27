@@ -1,10 +1,10 @@
 module Chat.Data exposing (decodeMessage, decodeMessages, fetchMessages, sendMessage)
 
-import Array exposing (Array, map)
+import Array exposing (map)
 import Chat.Types exposing (..)
-import Dict exposing (Dict, map, toList)
+import Dict exposing (Dict, map)
 import Http
-import Json.Decode as Decoder exposing (Decoder, bool, field, int, list, nullable, oneOf, string)
+import Json.Decode as Decoder exposing (bool, field, int, list, nullable, oneOf, string)
 import Json.Decode.Pipeline exposing (optional, required)
 import Json.Encode as Encoder
 import RemoteData exposing (..)

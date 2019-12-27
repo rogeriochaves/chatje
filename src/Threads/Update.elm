@@ -16,6 +16,7 @@ init =
     return
         { threads = Loading
         , unreads = Set.empty
+        , search = ""
         }
         Threads.Data.fetchThreads
 
@@ -134,3 +135,9 @@ updateThreads currentPage msg model =
 
         RefreshThreads ->
             return model fetchThreads
+
+        UpdateSearch search ->
+            return { model | search = search } Cmd.none
+
+        SearchThread ->
+            return model Cmd.none

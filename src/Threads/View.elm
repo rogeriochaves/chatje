@@ -1,6 +1,7 @@
 module Threads.View exposing (renderThread, view)
 
 import Element exposing (..)
+import Element.Input as Input
 import Html.Attributes
 import RemoteData exposing (..)
 import Router.Routes exposing (..)
@@ -8,17 +9,33 @@ import Styles
 import Threads.Data exposing (isUnread)
 import Threads.Types exposing (..)
 import User.Types exposing (User)
+import Utils exposing (onEnter)
 
 
 view : Page -> WebData User -> Model -> Element Msg
 view currentPage user model =
-    column
-        [ width (px 300)
-        , clipY
-        , scrollbarY
-        , htmlAttribute (Html.Attributes.style "height" "100vh")
+    column []
+        [ el ([ width fill ] ++ Styles.searchBox)
+            (Input.text
+                ([ height (px 40)
+                 , onEnter SearchThread
+                 ]
+                    ++ Styles.messageBoxInput
+                )
+                { onChange = UpdateSearch
+                , text = model.search
+                , placeholder = Just (Input.placeholder [] (text "Search threads"))
+                , label = Input.labelHidden "message to send"
+                }
+            )
+        , column
+            [ width (px 300)
+            , clipY
+            , scrollbarY
+            , htmlAttribute (Html.Attributes.style "height" "calc(100vh - 45px)")
+            ]
+            [ renderThreadList currentPage user model ]
         ]
-        [ renderThreadList currentPage user model ]
 
 
 renderThreadList : Page -> WebData User -> Model -> Element Msg
@@ -26,7 +43,10 @@ renderThreadList currentPage pendingUser model =
     case ( model.threads, pendingUser ) of
         ( Success threads, Success user ) ->
             column [ width (maximum 260 <| fill) ]
-                (List.map (renderThread currentPage user model) threads)
+                (threads
+                    |> List.filter (searchFilter user model)
+                    |> List.map (renderThread currentPage user model)
+                )
 
         ( Failure _, _ ) ->
             el [ padding 8 ] (text "Error on loading threads")
@@ -59,27 +79,36 @@ renderThread currentPage user model thread =
 
                 _ ->
                     []
+    in
+    link ([ padding 8 ] ++ threadStyle ++ currentThreadStyle)
+        { url = "/chat/" ++ thread.id
+        , label = paragraph [] [ text (threadName user thread) ]
+        }
 
-        threadLink threadName =
-            link ([ padding 8 ] ++ threadStyle ++ currentThreadStyle)
-                { url = "/chat/" ++ thread.id
-                , label = paragraph [] [ text threadName ]
-                }
+
+threadName : User -> Thread -> String
+threadName user thread =
+    let
+        threadName_ =
+            thread.participants
+                |> List.map .name
+                |> List.filter (\name -> name /= user.name)
+                |> String.join ", "
     in
     case thread.name of
         Just name ->
-            threadLink name
+            name
 
         Nothing ->
-            let
-                threadName =
-                    thread.participants
-                        |> List.map .name
-                        |> List.filter (\name -> name /= user.name)
-                        |> String.join ", "
-            in
-            if threadName == "" then
-                threadLink user.name
+            if threadName_ == "" then
+                user.name
 
             else
-                threadLink threadName
+                threadName_
+
+
+searchFilter : User -> Model -> Thread -> Bool
+searchFilter user model thread =
+    String.contains
+        (String.toLower model.search)
+        (String.toLower <| threadName user thread)

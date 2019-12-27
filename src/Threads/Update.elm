@@ -147,7 +147,7 @@ updateThreads currentPage msg model =
                     return { model | searchResult = Loading } (fetchSearch model.searchQuery)
 
                 _ ->
-                    return { model | selectedIndex = Nothing, searchQuery = "" } Cmd.none
+                    return { model | selectedIndex = Nothing, searchQuery = "", searchResult = NotAsked } Cmd.none
 
         LoadedSearch result ->
             return { model | searchResult = result } Cmd.none

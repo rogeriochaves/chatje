@@ -6,7 +6,6 @@ import Dict
 import Element exposing (..)
 import Element.Input as Input
 import Html.Attributes
-import Json.Decode as Decode
 import RemoteData exposing (..)
 import Styles exposing (..)
 import Time

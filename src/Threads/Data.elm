@@ -1,4 +1,4 @@
-module Threads.Data exposing (decodeSearchResults, decodeThreads, fetchSearch, fetchThreads, isUnread)
+module Threads.Data exposing (decodeSearchResults, decodeThreads, fetchSearch, fetchThreads, isUnread, searchFilter, selectedThread, threadName)
 
 import Array exposing (Array, map)
 import Dict exposing (Dict, map, toList)
@@ -9,6 +9,7 @@ import RemoteData exposing (..)
 import Set
 import Threads.Types exposing (..)
 import Url exposing (percentEncode)
+import User.Types exposing (User)
 
 
 fetchThreads : Cmd Msg
@@ -70,3 +71,57 @@ decodeSearchResults =
                 |> required "name" Decoder.string
             )
         )
+
+
+threadName : User -> Thread -> String
+threadName user thread =
+    let
+        threadName_ =
+            thread.participants
+                |> List.map .name
+                |> List.filter (\name -> name /= user.name)
+                |> String.join ", "
+    in
+    case thread.name of
+        Just name ->
+            name
+
+        Nothing ->
+            if threadName_ == "" then
+                user.name
+
+            else
+                threadName_
+
+
+searchFilter : User -> Model -> Thread -> Bool
+searchFilter user model thread =
+    String.contains
+        (String.toLower model.searchQuery)
+        (String.toLower <| threadName user thread)
+
+
+selectedThread : WebData User -> Model -> ThreadSelection
+selectedThread user model =
+    case user of
+        Success user_ ->
+            case ( model.selectedIndex, model.searchResult, model.threads ) of
+                ( Just index, Success users, _ ) ->
+                    List.drop index users
+                        |> List.head
+                        |> Maybe.map (SearchResult << .id)
+                        |> Maybe.withDefault NothingSelected
+
+                ( Just index, _, Success threads ) ->
+                    threads
+                        |> List.filter (searchFilter user_ model)
+                        |> List.drop index
+                        |> List.head
+                        |> Maybe.map (RecentThread << .id)
+                        |> Maybe.withDefault NothingSelected
+
+                _ ->
+                    NothingSelected
+
+        _ ->
+            NothingSelected

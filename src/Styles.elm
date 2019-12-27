@@ -1,4 +1,4 @@
-module Styles exposing (authorName, body, button, currentThread, fieldInput, messageBox, messageBoxInput, popUp, readThread, searchBox, selfName, timestamp, unreadThread)
+module Styles exposing (authorName, body, button, currentThread, fieldInput, messageBox, messageBoxInput, popUp, readThread, searchBox, selfName, timestamp, unreadThread, selectedThread)
 
 import Element exposing (..)
 import Element.Background as Background
@@ -78,6 +78,12 @@ currentThread : List (Attribute msg)
 currentThread =
     [ Font.bold
     , Font.color (rgb255 255 255 255)
+    ]
+
+
+selectedThread : List (Attribute msg)
+selectedThread =
+    [ Background.color (rgb255 100 100 100)
     ]
 
 

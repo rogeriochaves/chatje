@@ -1,4 +1,4 @@
-module Threads.Types exposing (Model, Msg(..), Participant, Thread, Threads)
+module Threads.Types exposing (Model, Msg(..), Participant, Thread, ThreadSelection(..), Threads)
 
 import RemoteData exposing (..)
 import Set
@@ -9,6 +9,7 @@ type alias Model =
     , unreads : Set.Set String
     , searchQuery : String
     , searchResult : WebData (List Participant)
+    , selectedIndex : Maybe Int
     }
 
 
@@ -35,5 +36,13 @@ type Msg
     | LoadedThreads (WebData Threads)
     | RefreshThreads
     | UpdateSearch String
-    | SearchThread
+    | SearchOrSelectThread ThreadSelection
     | LoadedSearch (WebData (List Participant))
+    | IndexDown
+    | IndexUp
+
+
+type ThreadSelection
+    = SearchResult String
+    | RecentThread String
+    | NothingSelected

@@ -197,7 +197,7 @@ class Client extends events_1.default {
             const res = yield this.httpApi.threadMessagesQuery(threadId, count);
             const thread = res[threadId];
             if (!thread)
-                return null;
+                return [];
             return thread.messages.nodes.map(message => Message_1.parseThreadMessage(threadId, message));
         });
     }

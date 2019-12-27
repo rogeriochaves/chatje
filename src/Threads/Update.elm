@@ -18,6 +18,7 @@ init =
         , unreads = Set.empty
         , searchQuery = ""
         , searchResult = NotAsked
+        , selectedIndex = Nothing
         }
         Threads.Data.fetchThreads
 
@@ -138,10 +139,60 @@ updateThreads currentPage msg model =
             return model fetchThreads
 
         UpdateSearch searchQuery ->
-            return { model | searchQuery = searchQuery, searchResult = NotAsked } Cmd.none
+            return { model | searchQuery = searchQuery, searchResult = NotAsked, selectedIndex = Nothing } Cmd.none
 
-        SearchThread ->
-            return { model | searchResult = Loading } (fetchSearch model.searchQuery)
+        SearchOrSelectThread selectedThread ->
+            case selectedThread of
+                NothingSelected ->
+                    return { model | searchResult = Loading } (fetchSearch model.searchQuery)
+
+                _ ->
+                    return { model | selectedIndex = Nothing, searchQuery = "" } Cmd.none
 
         LoadedSearch result ->
             return { model | searchResult = result } Cmd.none
+
+        IndexDown ->
+            let
+                nextItem =
+                    case model.selectedIndex of
+                        Nothing ->
+                            Just 0
+
+                        Just index ->
+                            if index >= lastItem model then
+                                Nothing
+
+                            else
+                                Just <| index + 1
+            in
+            return { model | selectedIndex = nextItem } Cmd.none
+
+        IndexUp ->
+            let
+                prevItem =
+                    case model.selectedIndex of
+                        Nothing ->
+                            Just <| lastItem model
+
+                        Just index ->
+                            if index <= 0 then
+                                Nothing
+
+                            else
+                                Just <| index - 1
+            in
+            return { model | selectedIndex = prevItem } Cmd.none
+
+
+lastItem : Model -> Int
+lastItem model =
+    case ( model.searchResult, model.threads ) of
+        ( Success users, _ ) ->
+            List.length users - 1
+
+        ( _, Success threads ) ->
+            List.length threads - 1
+
+        _ ->
+            0

@@ -66,15 +66,15 @@ app.get("/api/user", (_req, res) => {
 });
 
 app.get("/api/threads", (_req, res) => {
-  jsonResponse(
-    res,
-    facebook.getClient().getThreadList(100),
-    20000
-  );
+  jsonResponse(res, facebook.getClient().getThreadList(100), 20000);
 });
 
 app.get("/api/messages/:threadId", (req, res) => {
   jsonResponse(res, facebook.getClient().getMessages(req.params.threadId, 30));
+});
+
+app.get("/api/threads/search", (req, res) => {
+  jsonResponse(res, facebook.getClient().searchUsers(req.query.q));
 });
 
 app.post("/api/messages/:threadId/send", (req, res) => {
@@ -145,12 +145,11 @@ const reconnectOnTimeout = (promise, timeout = 5000) => {
   const timeoutPromise = new Promise((_resolve, reject) =>
     setTimeout(() => reject("Timeout"), timeout)
   );
-  return Promise.race([promise, timeoutPromise])
-    .catch(err => {
-      if (err === "Timeout") {
-        facebook.reconnectFromCache();
-      }
-    });
+  return Promise.race([promise, timeoutPromise]).catch(err => {
+    if (err === "Timeout") {
+      facebook.reconnectFromCache();
+    }
+  });
 };
 
 io.on("connection", socket => {

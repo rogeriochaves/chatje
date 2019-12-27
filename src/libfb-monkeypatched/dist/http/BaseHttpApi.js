@@ -42,6 +42,26 @@ class BaseHttpApi {
             return resp.json();
         });
     }
+    jsonPost(request) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            request.sign();
+            let extraHeaders = {};
+            if (this.token) {
+                extraHeaders['Authorization'] = 'OAuth ' + this.token;
+            }
+            const resp = yield node_fetch_1.default(request.url, {
+                headers: Object.assign({ 'User-Agent': USER_AGENT, 'Content-Type': 'application/json' }, extraHeaders),
+                method: 'POST',
+                body: JSON.stringify({
+                    doc_id: request.params.query_id,
+                    variables: JSON.parse(request.params.query_params)
+                })
+            });
+            if (!resp.ok)
+                throw new Errors_1.APIError(resp.statusText, yield resp.text());
+            return resp.json();
+        });
+    }
     sendImage(readStream, extension, from, to, streamLength) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             let randId = '';

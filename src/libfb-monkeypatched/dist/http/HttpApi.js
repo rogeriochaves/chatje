@@ -174,6 +174,20 @@ class HttpApi extends BaseHttpApi_1.default {
       );
     });
   }
+  searchUsers(query) {
+    return tslib_1.__awaiter(this, void 0, void 0, function*() {
+      return this.jsonPost(
+        new GraphQLRequest_1.default({
+          name: "SearchUsers",
+          params: {
+            search_query: query,
+            result_limit: 16,
+            context: "workchat"
+          }
+        })
+      );
+    });
+  }
   querySeqId() {
     return tslib_1.__awaiter(this, void 0, void 0, function*() {
       return this.post(

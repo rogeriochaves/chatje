@@ -201,6 +201,10 @@ class Client extends events_1.default {
             return thread.messages.nodes.map(message => Message_1.parseThreadMessage(threadId, message));
         });
     }
+    async searchUsers(query) {
+        const res = await this.httpApi.searchUsers(query);
+        return res.data.entities_named.search_results.edges;
+    }
     createQueue(seqId) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             // sync_api_version 3: You receive /t_ms payloads as json

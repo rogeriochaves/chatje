@@ -11,7 +11,8 @@ const queryTypes = {
     ThreadQuery: '10153919752036729',
     SeqIdQuery: '10155268192741729',
     UnreadThreadListQuery: '10153919752026729',
-    FetchStickersWithPreviewsQuery: '10152877994321729'
+    FetchStickersWithPreviewsQuery: '10152877994321729',
+    SearchUsers: '2530922320303835',
 };
 class GraphQLRequest extends HttpApiRequest_1.default {
     constructor(options) {

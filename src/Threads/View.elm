@@ -23,7 +23,7 @@ view currentPage user model =
                     ++ Styles.messageBoxInput
                 )
                 { onChange = UpdateSearch
-                , text = model.search
+                , text = model.searchQuery
                 , placeholder = Just (Input.placeholder [] (text "Search threads"))
                 , label = Input.labelHidden "message to send"
                 }
@@ -40,18 +40,35 @@ view currentPage user model =
 
 renderThreadList : Page -> WebData User -> Model -> Element Msg
 renderThreadList currentPage pendingUser model =
-    case ( model.threads, pendingUser ) of
-        ( Success threads, Success user ) ->
+    case ( model.searchResult, model.threads, pendingUser ) of
+        ( Success users, _, _ ) ->
+            column [ width (maximum 260 <| fill) ]
+                (users
+                    |> List.map
+                        (\user ->
+                            link ([ padding 8 ] ++ Styles.readThread)
+                                { url = "/chat/" ++ user.id
+                                , label = paragraph [] [ text user.name ]
+                                }
+                        )
+                )
+        ( Loading, _, _) ->
+            el [ padding 8 ] (text "Searching...")
+
+        ( Failure _, _, _) ->
+            el [ padding 8 ] (text "Error on searching users")
+
+        ( _, Success threads, Success user ) ->
             column [ width (maximum 260 <| fill) ]
                 (threads
                     |> List.filter (searchFilter user model)
                     |> List.map (renderThread currentPage user model)
                 )
 
-        ( Failure _, _ ) ->
+        ( _, Failure _, _ ) ->
             el [ padding 8 ] (text "Error on loading threads")
 
-        ( _, Failure _ ) ->
+        ( _, _, Failure _ ) ->
             el [ padding 8 ] (text "Error on loading user")
 
         _ ->
@@ -110,5 +127,5 @@ threadName user thread =
 searchFilter : User -> Model -> Thread -> Bool
 searchFilter user model thread =
     String.contains
-        (String.toLower model.search)
+        (String.toLower model.searchQuery)
         (String.toLower <| threadName user thread)

@@ -6,7 +6,7 @@ import Return exposing (Return, return)
 import Router.Routes exposing (..)
 import Router.Types
 import Set
-import Threads.Data exposing (fetchThreads, isUnread)
+import Threads.Data exposing (fetchSearch, fetchThreads, isUnread)
 import Threads.Types exposing (..)
 import Types
 
@@ -16,7 +16,8 @@ init =
     return
         { threads = Loading
         , unreads = Set.empty
-        , search = ""
+        , searchQuery = ""
+        , searchResult = NotAsked
         }
         Threads.Data.fetchThreads
 
@@ -136,8 +137,11 @@ updateThreads currentPage msg model =
         RefreshThreads ->
             return model fetchThreads
 
-        UpdateSearch search ->
-            return { model | search = search } Cmd.none
+        UpdateSearch searchQuery ->
+            return { model | searchQuery = searchQuery, searchResult = NotAsked } Cmd.none
 
         SearchThread ->
-            return model Cmd.none
+            return { model | searchResult = Loading } (fetchSearch model.searchQuery)
+
+        LoadedSearch result ->
+            return { model | searchResult = result } Cmd.none

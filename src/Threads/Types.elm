@@ -7,7 +7,8 @@ import Set
 type alias Model =
     { threads : WebData Threads
     , unreads : Set.Set String
-    , search : String
+    , searchQuery : String
+    , searchResult : WebData (List Participant)
     }
 
 
@@ -35,3 +36,4 @@ type Msg
     | RefreshThreads
     | UpdateSearch String
     | SearchThread
+    | LoadedSearch (WebData (List Participant))

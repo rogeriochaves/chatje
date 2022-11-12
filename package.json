@@ -20,7 +20,7 @@
     "elm-webpack-loader": "6.0.0",
     "node-dev": "4.0.0",
     "webpack": "4.40.2",
-    "webpack-cli": "3.3.9",
+    "webpack-cli": "3.3.12",
     "webpack-dev-middleware": "3.7.1"
   },
   "dependencies": {

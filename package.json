@@ -27,7 +27,7 @@
     "ejs": "2.7.1",
     "express": "4.17.1",
     "libfb": "2.3.4",
-    "socket.io": "2.2.0",
+    "socket.io": "2.5.0",
     "socket.io-client": "2.2.0",
     "yargs": "14.0.0"
   }

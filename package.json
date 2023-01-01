@@ -17,10 +17,10 @@
     "electron": "6.0.9",
     "electron-packager": "14.0.6",
     "elm-test": "0.19.0",
-    "elm-webpack-loader": "6.0.0",
+    "elm-webpack-loader": "8.0.0",
     "node-dev": "4.0.0",
-    "webpack": "4.40.2",
-    "webpack-cli": "3.3.9",
+    "webpack": "5.75.0",
+    "webpack-cli": "5.0.1",
     "webpack-dev-middleware": "3.7.1"
   },
   "dependencies": {
